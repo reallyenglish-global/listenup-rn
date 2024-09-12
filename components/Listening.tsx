@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
 import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { ListeningSession } from '@/services/ListeningSession';
 import { Audio } from 'expo-av';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import Speakers from './Speakers';
 
 // Assuming you have a RootStackParamList defined somewhere in your app
 type RootStackParamList = {
@@ -133,16 +134,9 @@ const Listening = () => {
         <View style={styles.placeholder} />
       </View>
 
-      <Text style={styles.questionText}>{currentStage.question}</Text>
-
-      <View style={styles.speakersContainer}>
-        {currentStage.speakers.map((speaker, index) => (
-          <View key={index} style={styles.speakerItem}>
-            <Image source={{ uri: speaker.image }} style={styles.speakerImage} />
-            <Text style={styles.speakerName}>{speaker.name}</Text>
-          </View>
-        ))}
-      </View>
+      <Speakers
+        speakers={currentStage.speakers}
+      />
 
       <View style={styles.progressBarContainer}>
         <Text style={styles.timeText}>{formatTime(currentTime)}</Text>
@@ -232,22 +226,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     textAlign: 'center',
     marginBottom: 20,
-  },
-  speakersContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 20,
-  },
-  speakerItem: {
-    alignItems: 'center',
-  },
-  speakerImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-  },
-  speakerName: {
-    marginTop: 5,
   },
   progressBarContainer: {
     flexDirection: 'row',

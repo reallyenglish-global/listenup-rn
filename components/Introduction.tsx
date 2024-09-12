@@ -1,30 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, useWindowDimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
+import Speakers from './Speakers';
+import { ListeningSession } from '@/services/ListeningSession';
 const Introduction = ({ navigation }) => {
   const { width, height } = useWindowDimensions();
 
-  const stages = [
-    {
-      number: 1,
-      question: "What makes you happy?",
-      speakers: [
-        { name: "Nick", image: require('../assets/images/speakers/Nick.png') },
-        { name: "Anna", image: require('../assets/images/speakers/Anna.png') }
-      ],
-      time: "00:21",
-      difficulty: 1,
-      failedTimes: 0,
-      context: "Nick and Anna are married. Nick is from London, and Anna grew up near San Francisco. They are talking about happiness."
-    },
-    // Add more stages as needed
-  ];
+  const [session, setSession] = useState(new ListeningSession());
+  const stages = session.getAllStages();
 
   return (
     <View style={[styles.container, { width, height }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {stages.map((stage, index) => (
+        {stages.slice(0, 1).map((stage, index) => (
           <View key={index} style={styles.stage}>
             <View style={styles.header}>
               <Icon name="bars" size={24} color="#000" />
@@ -33,17 +21,14 @@ const Introduction = ({ navigation }) => {
             </View>
             
             <View style={styles.questionContainer}>
-              <Text style={styles.question}>{stage.question}</Text>
+              <Text style={styles.title}>{stage.title}</Text>
             </View>
             
             <View style={styles.speakersContainer}>
               <Text style={styles.speakersLabel}>Speakers</Text>
-              {stage.speakers.map((speaker, idx) => (
-                <View key={idx} style={styles.speakerItem}>
-                  <Image source={speaker.image} style={styles.speakerImage} />
-                  <Text style={styles.speakerName}>{speaker.name}</Text>
-                </View>
-              ))}
+              <Speakers
+                speakers={stage.speakers}
+              />
               <View style={styles.failedContainer}>
                 <Text style={styles.failedLabel}>Failed</Text>
                 <Text style={styles.failedTimes}>{stage.failedTimes.toString().padStart(2, '0')}</Text>

@@ -15,6 +15,10 @@ export class ListeningSession {
     this.plays = 0;
   }
 
+  getAllStages(): Stage[] {
+    return this.stageManager.getAllStages();
+  }
+
   getCurrentStage(): Stage {
     return this.stageManager.getAllStages()[this.currentStageIndex];
   }
