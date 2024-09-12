@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Speakers from './Speakers';
 import { ListeningSession } from '@/services/ListeningSession';
 import HeaderBar from './HeaderBar';
+import StageTitle from './StageTitle';
 const Introduction = ({ navigation }) => {
   const { width, height } = useWindowDimensions();
 
@@ -18,9 +19,7 @@ const Introduction = ({ navigation }) => {
 
             <HeaderBar stageNumber={stage.number} />
             
-            <View style={styles.questionContainer}>
-              <Text style={styles.title}>{stage.title}</Text>
-            </View>
+            <StageTitle title={stage.title} />
             
             <View style={styles.speakersContainer}>
               <Text style={styles.speakersLabel}>Speakers</Text>
@@ -76,17 +75,6 @@ const styles = StyleSheet.create({
   },
   stage: {
     flex: 1,
-  },
-  questionContainer: {
-    backgroundColor: '#3498db',
-    padding: 20,
-    borderRadius: 10,
-    marginBottom: 20,
-  },
-  question: {
-    color: '#fff',
-    fontSize: 28,
-    textAlign: 'center',
   },
   speakersContainer: {
     flexDirection: 'row',

@@ -8,6 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import Speakers from './Speakers';
 import HeaderBar from './HeaderBar';
+import StageTitle from './StageTitle';
 
 const Listening = () => {
   const [session, setSession] = useState(new ListeningSession());
@@ -112,6 +113,8 @@ const Listening = () => {
   return (
     <SafeAreaView style={styles.container}>
       <HeaderBar stageNumber={session.getCurrentStageNumber()} />
+
+      <StageTitle title={currentStage.title} />
 
       <Speakers
         speakers={currentStage.speakers}
