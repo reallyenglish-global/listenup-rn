@@ -19,11 +19,11 @@ const ListeningStage = () => {
 
       <View style={styles.speakersContainer}>
         <View style={styles.speakerItem}>
-          <Image source={require('./assets/nick.jpg')} style={styles.speakerImage} />
+          <Image source={require('../assets/images/speakers/Nick.png')} style={styles.speakerImage} />
           <Text style={styles.speakerName}>Nick</Text>
         </View>
         <View style={styles.speakerItem}>
-          <Image source={require('./assets/anna.jpg')} style={styles.speakerImage} />
+          <Image source={require('../assets/images/speakers/Anna.png')} style={styles.speakerImage} />
           <Text style={styles.speakerName}>Anna</Text>
         </View>
       </View>

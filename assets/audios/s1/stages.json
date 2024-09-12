@@ -1,0 +1,574 @@
+{
+  "stages" : [
+    {
+      "title" : "What makes you happy?",
+      "situation" : "Nick and Anna are married. Nick is from London, and Anna grew up near San Francisco. They are talking about happiness.",
+      "failureMessage" : "Oh no! Did you find listening to Anna difficult? She was speaking quite slowly, but maybe her accent confused you. She has an American accent. Try listening again – it’ll get easier!",
+      "successMessage" : "Well done! What makes you happy? Do you like the same things as Anna?",
+      "transcript" : "N: What makes you happy?\n\rA: Um … I like … finishing work.\r\rN: (Laughs)\r\rA: Um … I like the end of the day. Um … I like going on holiday … um … going to restaurants … um … being with friends and family.",
+      "duration" : "00:21",
+      "difficulty" : 1,
+      "speakers" : [
+        {
+          "name" : "Nick",
+          "image" : "Nick"
+        },
+        {
+          "name" : "Anna",
+          "image" : "Anna"
+        }
+      ],
+      "mcqs" : [
+        {
+          "body" : "When is Anna the happiest?",
+          "options" : [
+            "After work|When she finishes work.",
+            "At work|When she is working.|In the office",
+            "Before work|Before she starts work.|When she wakes up.",
+            "At the start of the work day|When she arrives at work."
+          ]
+        },
+        {
+          "body" : "Which of these things is NOT true for Anna?",
+          "options" : [
+            "She never goes to restaurants.",
+            "She likes the end of her work day.|She is happy at the end of her work day.",
+            "She likes going on holiday.|She enjoys holidays.",
+            "She likes spending time with other people.|She likes being with her friends and family."
+          ]
+        }
+      ]
+    },
+    {
+      "title" : "What do you do?",
+      "situation" : "You’re going to listen to Nick and Anna again. This time, Nick is asking Anna about her job. Remember, Nick has a British accent, and Anna’s accent is American.",
+      "failureMessage" : "Oh no! Did you find listening to Anna difficult? She speaks quite clearly, but she has an American accent. Maybe that confused you. Try listening again! The more you listen to someone’s voice and accent, the easier it is to understand.",
+      "successMessage" : "Well done! Did you find Anna easy to understand? She speaks quite clearly. Did you notice how Anna’s and Nick’s accents were different?",
+      "transcript" : "N: What do you do?\n\rA: I’m a university lecturer.\r\rN: OK, and what does a university lecturer do?\r\rA: Um … I teach university students, and I also … er … research my work on literature.\r\rN: What’s the best bit about your job?\r\rA: Um … probably that I get to read books for a living.\r\rN: That’s an excellent answer.",
+      "duration" : "00:24",
+      "difficulty" : 1,
+      "speakers" : [
+        {
+          "name" : "Nick",
+          "image" : "Nick"
+        },
+        {
+          "name" : "Anna",
+          "image" : "Anna"
+        }
+      ],
+      "mcqs" : [
+        {
+          "body" : "Who does Anna work for?",
+          "options" : [
+            "A university",
+            "A researcher",
+            "A book store",
+            "A writer of literature|An author"
+          ]
+        },
+        {
+          "body" : "Which is the BEST description of Anna’s job?",
+          "options" : [
+            "She teaches and does research.|She is a teacher and a researcher.",
+            "She lectures and reads books.|She gives lectures and reads books.",
+            "She goes to the university and meets students.",
+            "She reads books and writes about literature."
+          ]
+        },
+        {
+          "body" : "Which of these things is NOT true about Anna.",
+          "options" : [
+            "She works with children.|She works with kids.",
+            "She likes reading books.|She enjoys reading.",
+            "She works for a university.",
+            "She works with university students."
+          ]
+        }
+      ]
+    },
+    {
+      "title" : "How do I get to the hotel?",
+      "situation" : "Chris and Matt work for the same company in different countries. Chris is from New Zealand and Matt is from the UK. Chris is visiting Matt’s ofﬁice and needs directions.",
+      "failureMessage" : "Oh no! Did you have trouble with the directions? It can be difficult to follow directions in your own language, so it’s not surprising if it’s hard in another language! Try listening a few more times and create a picture of a map in your head. ",
+      "successMessage" : "Well done! You can now find Chris’s hotel! Did you notice how Chris used the word ‘right’? ‘Right’ can be a direction, of course, meaning the opposite of left, but it’s also a way of showing you understand what someone is saying.",
+      "transcript" : "C: Do you know how to get to the Tune Hotel, Liverpool Street, from here?\n\rM: Tune Hotel … yes … yes, it’s very simple. Um, go out of the office, turn left …\r\rC: Right.\r\rM: And you go all the way to the end of the road. \r\rC: Right. So that’s onto Broadgate?\r\rM: Yes, I think it’s called Broadgate.\r\rC: Right.\r\rM: And you, you go right on Broadgate and it’s the first on your left. I think there’s a dentist on the left and you go, you go down that street – it’s called Folgate Street …\r\rC: OK.\r\rM: Um, past a pub, and it’s, it’s on your left, down there.\r\rC: [It] sounds pretty close. Thanks very much.\r\rM: OK!",
+      "duration" : "00:35",
+      "difficulty" : 2,
+      "speakers" : [
+        {
+          "name" : "Chris",
+          "image" : "Chris"
+        },
+        {
+          "name" : "Matt",
+          "image" : "Matt"
+        }
+      ],
+      "mcqs" : [
+        {
+          "body" : "Where does Chris want to go?|Where does Chris need directions to?",
+          "options" : [
+            "To his hotel|To the Tune Hotel|To a hotel",
+            "To Liverpool|To Liverpool Street|To the station",
+            "To the dentist|To Broadgate",
+            "To the pub|To Folgate Street"
+          ]
+        },
+        {
+          "body" : "What will he do at the end of the road?",
+          "options" : [
+            "Turn right|Turn right onto Broadgate",
+            "Turn left|Turn left onto Broadgate",
+            "Go straight on Broadgate|Go straight",
+            "Go under a bridge|Go over a bridge|Go past a bridge"
+          ]
+        },
+        {
+          "body" : "What will he walk past?|What will he pass?",
+          "options" : [
+            "A pub|A dentist",
+            "A station|A different hotel",
+            "Liverpool Street|Liverpool Street Station",
+            "A bridge|Folgate Street"
+          ]
+        }
+      ]
+    },
+    {
+      "title" : "Yoga",
+      "situation" : "Sally is from the UK. She’s a busy mother, but she still finds time to do her favourite hobby – yoga. Here, she’s taking to Matt about why she does it.",
+      "failureMessage" : "Oh no! Did you have problems understanding Sally, or understanding the questions? Listen again and remember to read the questions carefully before answering.",
+      "successMessage" : "Well done! You’re progressing very well through the challenges! Do you think you would benefit from regular yoga classes? Or do you prefer other forms of exercise?",
+      "transcript" : "S: I go once a week. I would go two or three times a week if I could, so it’s probably something that once the kids are older I’ll start doing more of. And I do it because I find that it’s very good for my flexibility and muscle tone … umm … just general good exercise. It’s also very relaxing.\n\rM: And how, how long is each session?\r\rS: It’s an hour and a half.\r\rM: And are there many people in the group?\r\rS: Well, last night there were only three, but quite often there can be up to a dozen, I think.\r\rM: And this is in a sports center or something?\r\rS: Yes, the local school has quite a nice, um, new gymnasium that was just built about three years ago, so it’s quite a good location.\r\rM: And you would recommend that to anyone?\r\rS: Yes, I would definitely recommend it to anybody.",
+      "duration" : "00:50",
+      "difficulty" : 2,
+      "speakers" : [
+        {
+          "name" : "Sally",
+          "image" : "Sally"
+        },
+        {
+          "name" : "Matt",
+          "image" : "Matt"
+        }
+      ],
+      "mcqs" : [
+        {
+          "body" : "What does Sally say about how often she does yoga?|Sally talks about how often she does yoga. What does she say?",
+          "options" : [
+            "She will probably do it more in the future.|In the future, she will probably do more of it.",
+            "She only likes to do it once a week.|She prefers to do it only once a week.",
+            "She does it two or three times a week.|She goes two or three times a week.|She would ideally like to do it more than three times a week.",
+            "She goes three times a week.|She does it three times a week.|She would ideally like to do it four times a week. "
+          ]
+        },
+        {
+          "body" : "Which of the following benefits does Sally NOT mention?",
+          "options" : [
+            "It builds strength.|It makes you stronger.",
+            "It's good for muscle tone.|It’s good for flexibility.|It makes you more flexible.",
+            "It's relaxing.|It relaxes her.|It's good for relaxation.",
+            "It's good exercise."
+          ]
+        },
+        {
+          "body" : "What does she say about the yoga sessions she goes to?|How does she describe her yoga sessions?",
+          "options" : [
+            "They last 90 minutes.|The number of people varies.|They last an hour and a half.",
+            "The class is always full.|The sessions last three hours.|They last less than 90 minutes.",
+            "There are 12 people who go regularly.|There's a regular group of 12 people who attend.",
+            "There are normally three people in the group.|The average number of people in the class is three."
+          ]
+        },
+        {
+          "body" : "Where does Sally have her yoga sessions?|Where are Sally's yoga sessions?",
+          "options" : [
+            "At a school nearby|At a school in her neighborhood",
+            "At a sports center|In a sports stadium",
+            "At the municipal gymnasium|At a public gym",
+            "At a school in the next town|At the school she used to go to as a child"
+          ]
+        }
+      ]
+    },
+    {
+      "title" : "Where do you live?",
+      "situation" : "Here, Matt from the UK is speaking to Marcelo. Marcelo is from somewhere different. But we’re not going to say where yet; it’s part of the challenge!",
+      "failureMessage" : "Oh no! Did you have trouble understanding Marcelo? He talks very quickly, doesn’t he? Try listening again! The more you listen to someone’s voice and accent, the easier it is to understand.",
+      "successMessage" : "Well done! Did you notice Marcelo’s accent? He’s from South America and his first language is Spanish, but he has quite a good British accent when he speaks English!",
+      "transcript" : "Matt: So, Marcelo, where do you live?\n\rMarcelo: In London.\r\rMatt: London? Umm … which part?\r\rMarcelo: Erm … north London, in an area called, um, Wood Green.\r\rMatt: Oh, OK. And is there an underground station there?\r\rMarcelo: Oh yes, there are two tube stations near where I live. It’s in the Piccadilly Line.\r\rMatt: You’re not from London, are you?\r\rMarcelo: No, no, no! I’m from Chile.\r\rMatt: Chile? Ah! Which part?\r\rMarcelo: Santiago de Chile. The capital.\r\rMatt: OK. And what do you do here?\r\rMarcelo: I’m an acupuncturist.\r\rMatt: And how long have you lived in London?\r\rMarcelo: I’ve been here for eight years now. I came here to study acupuncture … I studied three years and now I’m working here.",
+      "duration" : "00:36",
+      "difficulty" : 3,
+      "speakers" : [
+        {
+          "name" : "Matt",
+          "image" : "Matt"
+        },
+        {
+          "name" : "Marcelo",
+          "image" : "Marcelo"
+        }
+      ],
+      "mcqs" : [
+        {
+          "body" : "Where does Marcelo live?",
+          "options" : [
+            "In north London|In Wood Green|North London|Wood Green",
+            "In a wood|South London|On a green|In East London",
+            "In Piccadilly|Underground|Near Picadilly",
+            "In Chile|In Santiago|In a different country"
+          ]
+        },
+        {
+          "body" : "Where is Marcelo from?|Where does Marcelo come from?",
+          "options" : [
+            "Chile|Santiago de Chile",
+            "London|North London",
+            "Piccadilly",
+            "The capital of the UK"
+          ]
+        },
+        {
+          "body" : "What does Marcelo do?|What’s Marcelo’s job?",
+          "options" : [
+            "Acupuncturist|He’s an acupuncturist.",
+            "Student|He’s a student.|He studies.",
+            "He works underground.|He teaches acupuncture.|He works for the London Underground.",
+            "He’s an interpreter.|He's a translator."
+          ]
+        }
+      ]
+    },
+    {
+      "title" : "Family life",
+      "situation" : "Jameela was born in Pakistan, but now she lives in the USA. She speaks with an American accent. Here, she’s talking about family life when she was growing up.",
+      "failureMessage" : "Oh no! Jameela has a very clear American accent, but she speaks quite quickly. Listen again and read the questions carefully before answering.",
+      "successMessage" : "Well done! You managed to follow Jameela’s ideas, even though she was speaking quite quickly. Do you agree with her views on families? Did you grow up in a nuclear family, or was your family different?",
+      "transcript" : "I think small, nuclear families are ideal. In my experience, living with your extended family never works. Although I live in the US now, I was born in Pakistan and grew up in a household where there were three generations living together, including uncles, aunties, and cousins. So yes, there were always other children to play with, lots of adults to interact with, and it did feel cozy and secure, and I had the feeling of ... well ... belonging. And, of course, if anyone was sick or anything like that, there was always help at hand.\r\rBut living in such a close-knit family like that is very, very intense. There's no privacy at all, and you just get fed up at some point. I think people need more personal space. And there are so many constraints because the older members of the family are always averse to any kind of changes and want everything to run exactly like it did \"in their day.\" It's really hard to fit in with everybody.",
+      "duration" : "00:53",
+      "difficulty" : 3,
+      "speakers" : [
+        {
+          "name" : "Jameela",
+          "image" : "Jameela",
+          "imageSolo" : "Jameela_Solo"
+        }
+      ],
+      "mcqs" : [
+        {
+          "body" : "What kind of family life does Jameela like best?|What is Jameela's ideal family?",
+          "options" : [
+            "Families consisting of two parents and their children|Families which have two parents and their children",
+            "Large families|Families with a lot of members",
+            "Extended families",
+            "Single-parent families|Families with only one parent"
+          ]
+        },
+        {
+          "body" : "Who was NOT living in her house in Pakistan?",
+          "options" : [
+            "Her children|Her husband",
+            "Her parents|Her mom and dad",
+            "Her grandparents|Aunts|Her parents' parents",
+            "Cousins|Uncles|Her parents' brothers and sisters"
+          ]
+        },
+        {
+          "body" : "What benefits of living in an extended family does she NOT mention?",
+          "options" : [
+            "It was a lot cheaper.|There were lots of toys to play with.|They managed to save a lot of money.|They ate really well.",
+            "She felt safe.|There was a sense of security.",
+            "There were lots of people to interact with.|There were lots of opportunities for interaction.",
+            "There were always people around if you needed help.|Help was available if you needed it.|If you needed help, it was easy to find."
+          ]
+        },
+        {
+          "body" : "What disadvantage of extended families does she mention?|What downside of extended families does she talk about",
+          "options" : [
+            "There was no privacy.|It is too intense.",
+            "There wasn’t enough food.|There’s too much personal space.|There was never enough to eat.|She felt lonely.",
+            "People were often sick.|Someone always needed help.|People always complained.",
+            "There weren’t enough rooms for everyone.|You couldn’t fit everybody into the house.|The house was too small."
+          ]
+        },
+        {
+          "body" : "What does she think of the older members of the family?",
+          "options" : [
+            "They always think the old ways are best.|They don’t like change.|They like things the way they are.",
+            "They need more personal space.|They don’t respect personal space.|Personal space is important for them.",
+            "They are too intense.|They always need help.|They are always getting sick.",
+            "They welcome all kinds of changes.|They don’t fit in.|They aren't respected by the rest of the family."
+          ]
+        }
+      ]
+    },
+    {
+      "title" : "Sports growing up",
+      "situation" : "Jeremy grew up in Texas, so he has an American accent. As a child, he enjoyed sports. You’re going to listen to him talking about the sports he used to play.",
+      "failureMessage" : "Oh no! Were the questions too hard, or was Jeremy’s accident unfamiliar? Try listening again! The more you listen to an accent, the easier it is to understand.",
+      "successMessage" : "Well done! Did you notice Jeremy’s accent? He’s from Texas, in the USA, and tends to speak quite slowly. He’s quite good at skateboarding even now, in his thirties!",
+      "transcript" : "Where I grew up there were not so many sports to choose from. So you either were involved in American football, baseball or basketball.\n\nAnd each of those require a fair number of teammates and opponents, and it wasn’t always easy to find, um, a group of people to play with, or play against. \n\nSo it was easier to go towards an individual sport where I could choose the time and place … and so that was … I mean, at first I started with freestyle biking – BMX freestyle bikes – but I became scared of the handlebars.\n\nI was afraid of getting harpooned by the handlebars, because some of the things you have to do on a bike are pretty dangerous! So I came across skateboards, and skateboards are controlled by your feet alone. And then people in my neighborhood, or a few other people in my neighborhood, began doing it as well, so we had a little group.",
+      "duration" : "00:58",
+      "difficulty" : 3,
+      "speakers" : [
+        {
+          "name" : "Jeremy",
+          "image" : "Jeremy",
+          "imageSolo" : "Jeremy_Solo"
+        }
+      ],
+      "mcqs" : [
+        {
+          "body" : "Which sport does Jeremy NOT mention?",
+          "options" : [
+            "Hockey|Fishing|Soccer|Athletics",
+            "American football|Freestyle biking",
+            "Baseball|Skateboarding",
+            "Basketball"
+          ]
+        },
+        {
+          "body" : "Why didn’t Jeremy play team sports much?|What reason does Jeremy give for not playing team sports much?",
+          "options" : [
+            "It was difficult to find enough people for two teams.|There often weren’t enough people for two teams.|It was hard to find the right number of people.",
+            "He didn’t like them.|He didn’t enjoy sports.|He thought team sports were boring.",
+            "He didn’t have any friends.|He couldn’t make enough friends.|None of his friends liked team sports.",
+            "He wasn’t good at playing them.|He injured himself too much.|He thought they were too dangerous."
+          ]
+        },
+        {
+          "body" : "What was the first individual sport Jeremy tried?|Which individual sport did Jeremy try first?",
+          "options" : [
+            "Freestyle biking|BMX biking",
+            "Basketball|Baseball",
+            "Skateboarding|Harpooning|Skating",
+            "American football|Football|Soccer"
+          ]
+        },
+        {
+          "body" : "Why did Jeremy change to skateboarding?|What made Jeremy try skateboarding instead?",
+          "options" : [
+            "Biking was too dangerous.|He was scared of accidents.|He was worried about getting injured.",
+            "There were too many people biking.|Biking was too popular.|BMX biking wasn't cool anymore.",
+            "All his friends had already started skateboarding.|Everyone else was skateboarding.|Skateboarding was cooler than BMX biking.",
+            "He had an accident with the handlebars.|He injured himself on the handlebars.|He had to go to hospital after an accident."
+          ]
+        }
+      ]
+    },
+    {
+      "title" : "An important book",
+      "situation" : "You’re going to listen to Chris and Matt again. Remember, Chris is from New Zealand, and Matt is from the UK. They’re discussing a book that’s important to Chris.",
+      "failureMessage" : "Oh no! Did you have trouble understanding Chris? Or were you unsure about the vocabulary? Listen again and write down any words that you don’t understand and that you think are important. Then look them up in a dictionary.",
+      "successMessage" : "Well done! Have you read the book Chris was talking about, or perhaps seen the films? If so, do you agree with what Chris says about it? If not, would you like to read it after what you have heard? What was the first book that made an impression on you?",
+      "transcript" : "M: What was the first book you read that made an impression on you?\n\rC: I think it was probably Lord of the Rings.\r\rM: Oh, really? What age were you when you read that?\r\rC: Eight?\r\rM : Wow. OK.\r\rC: Great story, very long … so I think it took me several weeks to read all of them. And by the end of it, I knew those characters and that world very well.\r\rM: You like fantasy now as well, don’t you?\r\rC: I do, I do. And I still enjoy every few years re-reading the Lord of the Rings.\r\rM: Why is that? I mean, if you know all the story … ?\r\rC: Well, I think in part it’s because it’s now a very familiar, nostalgic story. Of course I can read it much more quickly, but it takes me back to, um, a kind of childhood time when I was reading it, and I can, I can recapture that feeling. \r\rM: And, I mean, it is very well-written.\r\rC: It is. So even now it’s, it’s still … its not disappointing to an adult, you know, it has themes and ideas in it that I didn't notice when I was a child, that now I do, so it’s, it’s complicated enough to reward repeated reading, which is not true of a lot of books.\r\rM: Mm, great choice.",
+      "duration" : "01:17",
+      "difficulty" : 4,
+      "speakers" : [
+        {
+          "name" : "Matt",
+          "image" : "Matt"
+        },
+        {
+          "name" : "Chris",
+          "image" : "Chris"
+        }
+      ],
+      "mcqs" : [
+        {
+          "body" : "According to the dialog, Lord of the Rings",
+          "options" : [
+            "made a strong impression on Chris as a child.|was important to Chris as a child.|was a part of Chris's childhood.",
+            "is the first book Chris read.|is the first book Chris remembers reading.|is the only book Chris read.",
+            "is the best book Chris has ever read.|is the longest book Chris has ever read.|is Chris's second favourite book.",
+            "is definitely the most important book that Chris read as a child.|is without doubt the most important book that Chris has read.|is undoubtably the most important book of Chris's childhood."
+          ]
+        },
+        {
+          "body" : "How long did it take Chris to read the book the first time?|How much time did Chris spend reading the book the first time?",
+          "options" : [
+            "Several weeks|More than one week|More than a week",
+            "A very long time|Ages and ages|What felt like forever",
+            "Eight weeks|Eight days|Eight months",
+            "A few years|A few months|A few days"
+          ]
+        },
+        {
+          "body" : "According to the dialog, how many times has Chris read the book?",
+          "options" : [
+            "Many times|A lot of times",
+            "Eight times|Eighteen times|Eighty times",
+            "Two or three times|Once or twice",
+            "Over fifty times|Over one hundred times"
+          ]
+        },
+        {
+          "body" : "What sort of a book does he say it is?",
+          "options" : [
+            "Fantasy|A fantasy novel",
+            "Fiction|A quick read|An adventure story",
+            "Nostalgia|Nostalgic",
+            "Childish|For children"
+          ]
+        },
+        {
+          "body" : "Why does Chris like reading this book again?",
+          "options" : [
+            "It reminds him of when he first read it as a child.|It brings back memories of his childhood.|It's nostalgic for him.",
+            "It’s easy to read.|It’s rewarding.|It's fantastic.|It's funny.",
+            "He likes reading children’s books.|He likes reading it to his children.|The children in the story remind him of his own childhood.",
+            "He can read it quickly.|He used to find it disappointing but now he doesn’t.|It's a quick read."
+          ]
+        },
+        {
+          "body" : "Which of the following is true, according to Chris?",
+          "options" : [
+            "Many books are not good enough to read more than once.|There aren't many books good enough to read more than once.|It's rare to find a book you want to read more than once.",
+            "This book is too complicated for a child.|This isn’t a book for children.|Even though children read the book, it's not appropriate for them.",
+            "This book is disappointing for adults.|This book is complicated even for adults.|Most adults don't understand the story.",
+            "He doesn’t understand the themes and ideas.|The themes and ideas are universal.|We could all learn something from the themes and ideas in the book."
+          ]
+        }
+      ]
+    },
+    {
+      "title" : "Presentation tips",
+      "situation" : "David is a manager from the UK who works in Hong Kong. In his job, he has to watch a lot of presentations. Here, he gives us some tips on what makes a good one.",
+      "failureMessage" : "Oh no! Was David’s talk too difficult to follow? There is quite a lot of detail here, and some very useful hints. Listen again and read the questions carefully before answering.",
+      "successMessage" : "Well done! You should now be able to give a good presentation yourself! Why not try preparing a short talk and follow David’s tips?",
+      "transcript" : "I often have to listen to presentations during the course of my working week, and it never fails to amaze me that, despite the vast number of books, websites and training courses available, that so many people get the basics so completely wrong. It’s not that I expect everyone to wow me with the confidence of, say, Bill Clinton or Tony Blair, but there are some basics that everyone should know before addressing an audience of whatever size.\r\rFor me, the most important thing is to have the tools available that help, rather than hinder, you. PowerPoint presentations can be very useful, but if the presenter simple parrots the text that appears on screen, audience attention is sure to flag. The text and graphics should enhance and illustrate what you say. Too much detail is an absolute no-no. \r\rNot everyone is a born entertainer, but we can all show our enthusiasm. And there is nothing worse than listening to someone drone on about a topic they simply don’t sound interested in.\r\rOther basic tips are to slow down, use pauses effectively, project your voice, and look at your audience – not at your notes. In fact, good speakers tend to memorize the key points and refer back to notes only occasionally, if at all.\r\rFinally, speakers should never ever over-run their allocated time slot, especially if there’s a risk of cutting into the audience’s break time or lunch hour.",
+      "duration" : "01:35",
+      "difficulty" : 5,
+      "speakers" : [
+        {
+          "name" : "David",
+          "image" : "David",
+          "imageSolo" : "David_Solo"
+        }
+      ],
+      "mcqs" : [
+        {
+          "body" : "How often does David have to sit through presentations?|How often does David watch presentations?",
+          "options" : [
+            "Probably every week|Probably most weeks|Frequently|All the time",
+            "Never|He doesn't watch presentations.|Presentations aren't a part of his professional life.",
+            "Not very often|Infrequently|Very rarely|Very occasionally",
+            "Every working day|Every day of the week|Sometimes at weekends"
+          ]
+        },
+        {
+          "body" : "What is David surprised by?|What surprises David?|What does David find surprising?",
+          "options" : [
+            "How bad most presentations are|The poor quality of most presentations|That more presentations aren't better.",
+            "How many training courses are available|How amazing the training courses available are|That more people don't go on training courses|That the cost of training hasn't gone down",
+            "How hard it is to learn the basics|How complicated the basics are|How difficult presenting is|How basic most presentations are",
+            "How many books there are on the subject|How basic the books on the subject are|How boring most presentations are|How boring most books on the subject are"
+          ]
+        },
+        {
+          "body" : "Which of the following does David believe?",
+          "options" : [
+            "All speakers should know the basics of how to give a presentation.|There are a few basic things that all presenters should know.",
+            "Speakers should always ‘wow’ their audience.|You need your audience to believe that you are confident.|The 'wow factor' is the most important element of a presentation.|If the audience isn't 'wowed', the presentation has failed.",
+            "Presenters should aim to sound like Bill Clinton.|Tony Blair was a better public speaker than Bill Clinton.|Politicians are all excellent speakers.|British politicians aren't as good as American politicians at presenting.",
+            "Speakers should know the basics before addressing a big audience.|The size of the audience affects how good your presentation is.|With small audiences, forget the rules and just be yourself.|Large audiences are most presenters worst nightmare."
+          ]
+        },
+        {
+          "body" : "Which of the following does David NOT suggest speakers should do?",
+          "options" : [
+            "Memorize their presentation|Learn their whole presentation by heart|Learn the presentation like a script",
+            "Project their voice|Make their voice travel further|Increase the volume of their voice",
+            "Pause at appropriate moments|Pause when required|Use appropriate pauses",
+            "Look at the audience|Make eye contact with the people in the room|Connect with the people in the room by looking at them"
+          ]
+        },
+        {
+          "body" : "Which of the following does David say?",
+          "options" : [
+            "Speakers should avoid going into too much detail.|It's not a good idea to go into a lot of detail.|Key points are more important than minute detail.",
+            "PowerPoint presentations are boring.|Using PowerPoint distracts the audience.|PowerPoint is the enemy of good presentations.|More speakers should present without PowerPoint.",
+            "It’s a good idea for the speaker to read from the screen.|Reading from the screen helps you keep track of the structure.",
+            "You need to be a born entertainer to give a good presentation.|Being entertaining is more important than being enthusiastic.|It's important to make people laugh.|Comedy has a place in most presentations."
+          ]
+        },
+        {
+          "body" : "What is the last tip David gives?",
+          "options" : [
+            "You should always finish within the time specified.|You should always finish on time.|Punctuality is very important.",
+            "It is only OK to over-run if there’s a break or lunch afterwards.|If you plan to over-run into the break, let the audience know.",
+            "You should never cut off audience participation.|It's risky to encourage too much audience participation.|Cut off difficult questions from the audience to avoid embarrassment.",
+            "You should always allocate a new time slot before a break.|Most people don't mind if their lunch break is cut short."
+          ]
+        }
+      ]
+    },
+    {
+      "title" : "Radio report on personal information",
+      "situation" : "Well done – you’ve reached the ﬁnal challenge! This clip comes from a radio report about internet security. The presenters are American. Good luck!",
+      "failureMessage" : "Oh no! Was the report too difficult to follow? It can be hard to keep track of a lot of information at once – in a list, for example. Try listening again and remember to read each question carefully before answering.",
+      "successMessage" : "Well done! You clearly understand the threat posed by identity theft through the internet! These days many young people publish information about themselves on social networking sites without really thinking how it might affect their future or personal security. What precautions do you take to protect your identity online?",
+      "transcript" : "M: We decided to look into just how much personal information could be found on an individual with a few clicks of the mouse. Quite frankly, it’s downright scary!  With my boss’s permission, we used him as the guinea pig. We were able to find out his occupation, his job history, his address – his home address – and unlisted telephone number. What’s worse is that we were able to access his credit history, his social security number and driver’s license number, which ultimately puts his identity at risk. When we accessed his credit history, another name appeared under his social security number, which means that someone may have already stolen his identity. He’s looking into that now.\r\rA: Well, my first question, of course, and I think a question that a lot of us would have, is, is this – getting this information on people – is this actually an illegal act? Is this against the law?\r\rM: No. What is against the law is to use someone else’s information to your advantage – to use someone else’s social security number, or driver’s license number for you own use.\r\rA: Right.\r\rM: Umm … it’s not illegal to—\r\rA: To actually obtain that information—\r\rM: No!\r\rA: But it’s actually how you use it.\r\rM: Yes.",
+      "duration" : "01:09",
+      "difficulty" : 5,
+      "speakers" : [
+        {
+          "name" : "Miranda",
+          "image" : "Miranda"
+        },
+        {
+          "name" : "Aaron",
+          "image" : "Aaron"
+        }
+      ],
+      "mcqs" : [
+        {
+          "body" : "What does Miranda think about getting personal information from the internet?|What is Miranda’s opinion on how easy it is to access personal information online?",
+          "options" : [
+            "It’s frightening how easy it is.|It’s astonishingly easy.|It’s very easy indeed.|It shocked her how easy it is.",
+            "It’s very difficult.|It needs to be looked into.|She doesn’t have an opinion.|It’s incredibly tough.",
+            "It’s easy with someone’s permission.|You need someone’s permission.|With the right permission, it’s very straightforward.|It’s importance to get clearance first.",
+            "It’s difficult to get some numbers.|It’s not as easy as most people think it is.|Most people agree that it’s impossible.|It’s your fault if someone accesses your personal information."
+          ]
+        },
+        {
+          "body" : "Which of the following did they NOT find out through the internet about her boss?|Which of the following pieces of information about her boss could Miranda NOT access",
+          "options" : [
+            "His telephone number at work|His credit card number|His spouse's name|His license plate number",
+            "His home address|Where he lives",
+            "His driver’s license number|His credit history",
+            "His social security number|His job history|Where he'd worked in the past"
+          ]
+        },
+        {
+          "body" : "When the researchers checked their boss’s social security number, they found another name. This means:",
+          "options" : [
+            "It is possible that his identity has been stolen.|He might have had his identity stolen.|There's a good possibility he's been the victim of identity theft.|He might have been the victim of fraud.",
+            "His identity has definitely been stolen.|He’s been the victim of identity theft.|Someone stole his identity.|Someone is impersonating him right now.",
+            "The information they used was wrong.|There was an error in the system.|His identity has been erased.|He hasn't been paying his taxes.",
+            "Another person has access to his credit card.|He changed his name when he was younger.|Someone has been using his bank account.|He must have changed his name at some point."
+          ]
+        },
+        {
+          "body" : "Aaron's first question is about",
+          "options" : [
+            "whether obtaining information on people is illegal.|whether obtaining this kind of information is against the law.|the legality of using the internet to obtain personal information.|whether obtaining this kind of information makes you a criminal.",
+            "whether identity theft is illegal.|whether identity theft is against the law.|whether identity theft is a criminal act.",
+            "whether buying information is against the law.|whether selling private information is illegal.|whether the market for information is legal or not.",
+            "whether people care about others obtaining information about them.|whether this is a political issue.|what you can do to protect yourself.|the measures you should take to stay safe."
+          ]
+        },
+        {
+          "body" : "Miranda explains that",
+          "options" : [
+            "it is illegal to use another person’s information for your own benefit.|it is against the law to profit from someone else’s information.|it's using the information that's illegal, not obtaining it.|if you use the information for personal gain, it's illegal.",
+            "it is not illegal to use another person’s information for your own benefit.|it isn’t against the law to profit from someone else’s information.|it is perfectly legal to use someone's information for profit.|it's a moral issue, not a legal one.",
+            "it is illegal to collect information about other people.|you can use the information you find any way you want.|there are companies that will pay you for the information, legally.|as long as no one finds out, you can't go to prison.",
+            "it is legal to use another person’s driver’s number.|how you use the information isn’t important.|it's only illegal to use social security numbers.|any money you earn from someone's information is legally yours."
+          ]
+        }
+      ]
+    }
+  ]
+}
