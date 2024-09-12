@@ -21,14 +21,14 @@ export class StageManager {
   }
 
   private parseStages(data: any): Stage[] {
-    return data.stages.map((stage: any) => ({
-      number: stage.number,
+    return data.stages.map((stage: any, index: number) => ({
+      number: index + 1,
       question: stage.question,
       speakers: stage.speakers.map((speaker: any) => ({
         name: speaker.name,
         image: `../assets/images/speakers/${speaker.image}.png`
       })),
-      audio: stage.audio,
+      audio: `../assets/audios/s1/S${index + 1}.mp3`,
       duration: stage.duration
     }));
   }

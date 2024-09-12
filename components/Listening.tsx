@@ -3,28 +3,53 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView } from 'r
 import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { ListeningSession } from '@/services/ListeningSession';
+import { Audio } from 'expo-av';
 
 const Listening = () => {
   const [session, setSession] = useState(new ListeningSession());
   const [isPlaying, setIsPlaying] = useState(false);
+  const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
+
+  useEffect(() => {
+    return sound
+      ? () => {
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
 
   const currentStage = session.getCurrentStage();
 
   const handleProgressChange = (progress: number) => {
     const newSession = new ListeningSession();
-    Object.assign(newSession, session);
-    newSession.setProgress(progress);
-    setSession(newSession);
+    session.setProgress(progress);
   };
 
-  const handlePlayPress = () => {
-    if (!isPlaying) {
-      const newSession = new ListeningSession();
-      Object.assign(newSession, session);
-      newSession.incrementPlays();
-      setSession(newSession);
+  const handlePlayPress = async () => {
+    if (sound) {
+      if (isPlaying) {
+        await sound.pauseAsync();
+      } else {
+        await sound.playAsync();
+      }
+      setIsPlaying(!isPlaying);
+    } else {
+      console.log('=======', currentStage.audio);
+      const { sound: newSound } = await Audio.Sound.createAsync(
+        { uri: currentStage.audio },
+        { shouldPlay: true }
+      );
+      setSound(newSound);
+      setIsPlaying(true);
     }
-    setIsPlaying(!isPlaying);
+  };
+
+  const handleSpeedChange = async (speed: number) => {
+    setPlaybackSpeed(speed);
+    if (sound) {
+      await sound.setRateAsync(speed, true);
+    }
   };
 
   return (
@@ -71,6 +96,21 @@ const Listening = () => {
         <View style={styles.playsCounter}>
           <Text style={styles.playsText}>Plays {session.getPlays()}</Text>
         </View>
+      </View>
+
+      <View style={styles.speedControlContainer}>
+        <Text style={styles.speedText}>Speed: {playbackSpeed.toFixed(1)}x</Text>
+        <Slider
+          style={styles.speedSlider}
+          minimumValue={0.5}
+          maximumValue={2.0}
+          step={0.1}
+          value={playbackSpeed}
+          onValueChange={handleSpeedChange}
+          minimumTrackTintColor="#3498db"
+          maximumTrackTintColor="#d3d3d3"
+          thumbTintColor="#3498db"
+        />
       </View>
 
       <View style={styles.bottomContainer}>
@@ -205,6 +245,17 @@ const styles = StyleSheet.create({
   bottomContainer: {
     alignItems: 'center',
     marginBottom: 20,
+  },
+  speedControlContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  speedText: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  speedSlider: {
+    width: '80%',
   },
 });
 
