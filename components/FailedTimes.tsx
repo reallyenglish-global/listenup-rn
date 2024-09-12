@@ -3,11 +3,12 @@ import { View, Text, StyleSheet } from 'react-native';
 
 interface FailedTimesProps {
   failedTimes: number;
+  height: number;
 }
 
-const FailedTimes: React.FC<FailedTimesProps> = ({ failedTimes }) => {
+const FailedTimes: React.FC<FailedTimesProps> = ({ failedTimes, height }) => {
   return (
-    <View style={styles.failedTimesPlate}>
+    <View style={[styles.failedTimesPlate, { height }]}>
       <Text style={styles.failedLabel}>Failed</Text>
       <Text style={styles.failedTimes}>{failedTimes.toString().padStart(2, '0')}</Text>
       <Text style={styles.timesLabel}>Times</Text>
@@ -18,10 +19,9 @@ const FailedTimes: React.FC<FailedTimesProps> = ({ failedTimes }) => {
 const styles = StyleSheet.create({
   failedTimesPlate: {
     backgroundColor: '#333',
-    borderRadius: 15,
+    borderRadius: 0,
     padding: 15,
-    minWidth: 120,
-    minHeight: 120,
+    width: 120,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',

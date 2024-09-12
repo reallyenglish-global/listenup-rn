@@ -12,6 +12,8 @@ const Introduction = ({ navigation }) => {
   const [session, setSession] = useState(new ListeningSession());
   const stages = session.getAllStages();
 
+  const SPEAKER_IMAGE_HEIGHT = 150; // Adjust this value to match your speaker image height
+
   return (
     <View style={[styles.container, { width, height }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -25,7 +27,7 @@ const Introduction = ({ navigation }) => {
               <Speakers
                 speakers={stage.speakers}
               />
-              <FailedTimes failedTimes={stage.failedTimes} />
+              <FailedTimes failedTimes={stage.failedTimes} height={SPEAKER_IMAGE_HEIGHT} />
             </View>
             
             <View style={styles.infoContainer}>
@@ -74,10 +76,7 @@ const styles = StyleSheet.create({
   speakersContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#E0E0E0',
-    padding: 10,
-    borderRadius: 10,
+    alignItems: 'flex-start',
     marginBottom: 20,
   },
   speakersLabel: {
@@ -86,14 +85,6 @@ const styles = StyleSheet.create({
   },
   speakerItem: {
     alignItems: 'center',
-  },
-  speakerImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-  },
-  speakerName: {
-    marginTop: 5,
   },
   infoContainer: {
     flexDirection: 'row',
