@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Slider } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-const ListeningStage = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
+const Listening = () => {
   const [progress, setProgress] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -191,4 +192,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ListeningStage;
+export default Listening;
