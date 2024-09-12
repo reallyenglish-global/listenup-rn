@@ -108,10 +108,13 @@ const Listening = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity>
-          <Text style={styles.backButton}>← Home</Text>
+        <TouchableOpacity style={styles.backButton}>
+          <Text style={styles.backButtonText}>← Home</Text>
         </TouchableOpacity>
-        <Text style={styles.stageText}>Stage {session.getCurrentStageNumber()}</Text>
+        <View style={styles.stageTextContainer}>
+          <Text style={styles.stageText}>Stage {session.getCurrentStageNumber()}</Text>
+        </View>
+        <View style={styles.placeholder} />
       </View>
 
       <Text style={styles.questionText}>{currentStage.question}</Text>
@@ -185,17 +188,29 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 20,
+    backgroundColor: 'lightgray',
+    padding: 10,
   },
   backButton: {
     padding: 10,
+    zIndex: 1,
   },
   backButtonText: {
     fontSize: 16,
     color: '#000',
   },
+  stageTextContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
   stageText: {
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  placeholder: {
+    width: 50, // Adjust this value to match the width of the back button
   },
   questionText: {
     fontSize: 24,
