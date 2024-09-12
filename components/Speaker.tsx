@@ -6,14 +6,14 @@ interface SpeakerProps {
   name: string;
 }
 
+const SPEAKER_IMAGE_HEIGHT = 150; // Should match the value in Introduction.tsx
+
 const Speaker: React.FC<SpeakerProps> = ({ imageUrl, name }) => {
   return (
     <View style={styles.speakerContainer}>
-      <View style={styles.imageContainer}>
-        <Image source={{ uri: imageUrl }} style={styles.speakerImage} />
-        <View style={styles.nameContainer}>
-          <Text style={styles.speakerName}>{name}</Text>
-        </View>
+      <Image source={{ uri: imageUrl }} style={styles.speakerImage} />
+      <View style={styles.nameContainer}>
+        <Text style={styles.speakerName}>{name}</Text>
       </View>
     </View>
   );
@@ -21,15 +21,13 @@ const Speaker: React.FC<SpeakerProps> = ({ imageUrl, name }) => {
 
 const styles = StyleSheet.create({
   speakerContainer: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  imageContainer: {
+    width: SPEAKER_IMAGE_HEIGHT,
+    height: SPEAKER_IMAGE_HEIGHT,
     position: 'relative',
   },
   speakerImage: {
-    width: 150,
-    height: 150,
+    width: '100%',
+    height: '100%',
   },
   nameContainer: {
     position: 'absolute',
@@ -40,7 +38,7 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   speakerName: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     color: 'white',
     textAlign: 'center',

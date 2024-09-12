@@ -77,14 +77,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 20,
-  },
-  speakersLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  speakerItem: {
-    alignItems: 'center',
   },
   infoContainer: {
     flexDirection: 'row',

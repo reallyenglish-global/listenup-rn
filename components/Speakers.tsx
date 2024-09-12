@@ -28,7 +28,6 @@ const Speakers: React.FC<SpeakersProps> = ({ speakers }) => {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    marginBottom: 20,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
