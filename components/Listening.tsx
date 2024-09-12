@@ -3,7 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-const Listening = () => {
+const Listening = ({ navigation }) => {
   const [progress, setProgress] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -42,9 +42,6 @@ const Listening = () => {
       </View>
 
       <View style={styles.controlsContainer}>
-        <View style={styles.progressIndicator}>
-          {/* Add colored bars for progress indicator */}
-        </View>
         <TouchableOpacity style={styles.playButton} onPress={() => setIsPlaying(!isPlaying)}>
           <Icon name={isPlaying ? "pause" : "play"} size={30} color="#fff" />
         </TouchableOpacity>
@@ -57,15 +54,10 @@ const Listening = () => {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.challengeButton}>
+      <TouchableOpacity style={styles.challengeButton} onPress={() => navigation.navigate('Test', { stageNumber: stages[0].number })}>
         <Text style={styles.challengeButtonText}>Challenge!</Text>
         <Icon name="chevron-right" size={20} color="#3498db" />
       </TouchableOpacity>
-
-      <View style={styles.volumeContainer}>
-        <Icon name="volume-up" size={20} color="#000" />
-        <Slider style={styles.volumeSlider} minimumValue={0} maximumValue={1} />
-      </View>
     </View>
   );
 };
@@ -134,10 +126,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   playButton: {
+    marginTop: 100,
+    marginBottom: 30,
     backgroundColor: '#3498db',
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -181,14 +175,6 @@ const styles = StyleSheet.create({
     color: '#3498db',
     fontSize: 18,
     marginRight: 10,
-  },
-  volumeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  volumeSlider: {
-    flex: 1,
-    marginLeft: 10,
   },
 });
 
