@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, useWindowDimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-const { width, height } = Dimensions.get('window');
-
 const Introduction = ({ navigation }) => {
+  const { width, height } = useWindowDimensions();
+
   const stages = [
     {
       number: 1,
