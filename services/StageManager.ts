@@ -24,9 +24,10 @@ export class StageManager {
     return data.stages.map((stage: any, index: number) => ({
       number: index + 1,
       title: stage.title,
+      context: stage.situation,
       speakers: stage.speakers.map((speaker: any) => ({
         name: speaker.name,
-        imageUrl: `../assets/images/speakers/${speaker.image}.png`
+        imageUrl: `../assets/images/speakers/${speaker.image}@2x.png`
       })),
       audioUrl: `../assets/audios/s1/S${index + 1}.mp3`,
       failedTimes: 0,

@@ -17,7 +17,7 @@ const Introduction = ({ navigation }) => {
   return (
     <View style={[styles.container, { width, height }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {stages.slice(0, 1).map((stage, index) => (
+        {stages.slice(-3, -2).map((stage, index) => (
           <View key={index} style={styles.stage}>
             <HeaderBar stageNumber={stage.number} />
             
@@ -78,6 +78,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
+  speakersLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  speakerItem: {
+    alignItems: 'center',
+  },
   infoContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -100,11 +107,11 @@ const styles = StyleSheet.create({
   },
   contextContainer: {
     flex: 1,
-    justifyContent: 'center',
-    marginBottom: 20,
+    justifyContent: 'top',
   },
   context: {
-    textAlign: 'center',
+    padding: 10,
+    textAlign: 'left',
     fontSize: 18,
     lineHeight: 24,
   },
