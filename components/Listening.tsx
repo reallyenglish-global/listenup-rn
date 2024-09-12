@@ -80,6 +80,8 @@ const Listening = () => {
             if (progressUpdateIntervalRef.current) {
               clearInterval(progressUpdateIntervalRef.current);
             }
+            // Increment play count when audio finishes
+            session.incrementPlays();
           } else {
             setProgress(status.positionMillis / status.durationMillis);
             setCurrentTime(status.positionMillis);
