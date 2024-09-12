@@ -1,64 +1,85 @@
-import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { ListeningSession } from '@/services/ListeningSession';
 
-const Listening = ({ navigation }) => {
-  const [progress, setProgress] = useState(0);
+const Listening = () => {
+  const [session, setSession] = useState(new ListeningSession());
   const [isPlaying, setIsPlaying] = useState(false);
 
+  const currentStage = session.getCurrentStage();
+
+  const handleProgressChange = (progress: number) => {
+    const newSession = new ListeningSession();
+    Object.assign(newSession, session);
+    newSession.setProgress(progress);
+    setSession(newSession);
+  };
+
+  const handlePlayPress = () => {
+    if (!isPlaying) {
+      const newSession = new ListeningSession();
+      Object.assign(newSession, session);
+      newSession.incrementPlays();
+      setSession(newSession);
+    }
+    setIsPlaying(!isPlaying);
+  };
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
-          <Text style={styles.backButtonText}>Home</Text>
+        <TouchableOpacity>
+          <Text style={styles.backButton}>← Home</Text>
         </TouchableOpacity>
-        <Text style={styles.stageText}>Stage 01</Text>
+        <Text style={styles.stageText}>Stage {session.getCurrentStageNumber()}</Text>
       </View>
 
-      <Text style={styles.questionText}>What makes you happy?</Text>
+      <Text style={styles.questionText}>{currentStage.question}</Text>
 
       <View style={styles.speakersContainer}>
-        <View style={styles.speakerItem}>
-          <Image source={require('../assets/images/speakers/Nick.png')} style={styles.speakerImage} />
-          <Text style={styles.speakerName}>Nick</Text>
-        </View>
-        <View style={styles.speakerItem}>
-          <Image source={require('../assets/images/speakers/Anna.png')} style={styles.speakerImage} />
-          <Text style={styles.speakerName}>Anna</Text>
-        </View>
+        {currentStage.speakers.map((speaker, index) => (
+          <View key={index} style={styles.speakerItem}>
+            <Image source={{ uri: speaker.image }} style={styles.speakerImage} />
+            <Text style={styles.speakerName}>{speaker.name}</Text>
+          </View>
+        ))}
       </View>
 
       <View style={styles.progressBarContainer}>
-        <Text>0:05</Text>
+        <Text style={styles.timeText}>
+          {session.getProgressTime()}
+        </Text>
         <Slider
           style={styles.progressBar}
           minimumValue={0}
           maximumValue={1}
-          value={progress}
-          onValueChange={setProgress}
+          value={session.getProgress()}
+          onValueChange={handleProgressChange}
+          minimumTrackTintColor="#3498db"
+          maximumTrackTintColor="#d3d3d3"
+          thumbTintColor="#3498db"
         />
-        <Text>0:21</Text>
+        <Text style={styles.timeText}>{currentStage.duration}</Text>
       </View>
 
       <View style={styles.controlsContainer}>
-        <TouchableOpacity style={styles.playButton} onPress={() => setIsPlaying(!isPlaying)}>
-          <Icon name={isPlaying ? "pause" : "play"} size={30} color="#fff" />
+        <TouchableOpacity style={styles.playButton} onPress={handlePlayPress}>
+          <Icon name={isPlaying ? "pause" : "play"} size={50} color="#fff" />
         </TouchableOpacity>
         <View style={styles.playsCounter}>
-          <Text style={styles.playsText}>Plays 1</Text>
+          <Text style={styles.playsText}>Plays {session.getPlays()}</Text>
         </View>
-        <TouchableOpacity style={styles.replayButton}>
-          <Icon name="rotate-right" size={20} color="#fff" />
-          <Text style={styles.replayText}>3s</Text>
-        </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.challengeButton} onPress={() => navigation.navigate('Test', { stageNumber: stages[0].number })}>
-        <Text style={styles.challengeButtonText}>Challenge!</Text>
-        <Icon name="chevron-right" size={20} color="#3498db" />
-      </TouchableOpacity>
-    </View>
+      <View style={styles.bottomContainer}>
+        <TouchableOpacity style={styles.challengeButton}>
+          <Text style={styles.challengeButtonText}>Challenge!</Text>
+          <Icon name="chevron-right" size={20} color="#3498db" />
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -175,6 +196,15 @@ const styles = StyleSheet.create({
     color: '#3498db',
     fontSize: 18,
     marginRight: 10,
+  },
+  timeText: {
+    fontSize: 16,
+    color: '#000',
+    marginBottom: 10,
+  },
+  bottomContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
   },
 });
 
