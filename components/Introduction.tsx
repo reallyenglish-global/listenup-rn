@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, useWindowD
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Speakers from './Speakers';
 import { ListeningSession } from '@/services/ListeningSession';
+import HeaderBar from './HeaderBar';
 const Introduction = ({ navigation }) => {
   const { width, height } = useWindowDimensions();
 
@@ -14,11 +15,8 @@ const Introduction = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {stages.slice(0, 1).map((stage, index) => (
           <View key={index} style={styles.stage}>
-            <View style={styles.header}>
-              <Icon name="bars" size={24} color="#000" />
-              <Text style={styles.stageNumber}>Stage {stage.number.toString().padStart(2, '0')}</Text>
-              <View style={{ width: 24 }} /> {/* Placeholder for symmetry */}
-            </View>
+
+            <HeaderBar stageNumber={stage.number} />
             
             <View style={styles.questionContainer}>
               <Text style={styles.title}>{stage.title}</Text>
@@ -78,16 +76,6 @@ const styles = StyleSheet.create({
   },
   stage: {
     flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  stageNumber: {
-    fontSize: 18,
-    fontWeight: 'bold',
   },
   questionContainer: {
     backgroundColor: '#3498db',

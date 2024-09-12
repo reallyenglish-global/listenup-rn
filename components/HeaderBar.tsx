@@ -25,9 +25,11 @@ const HeaderBar: React.FC<HeaderBarProps> = ({ stageNumber }) => {
 
   return (
     <View style={styles.header}>
-      <TouchableOpacity style={styles.backButton} onPress={handleHomePress}>
-        <Text style={styles.backButtonText}>← Home</Text>
-      </TouchableOpacity>
+      {navigation.canGoBack() && (
+        <TouchableOpacity style={styles.backButton} onPress={handleHomePress}>
+          <Text style={styles.backButtonText}>← Home</Text>
+        </TouchableOpacity>
+      )}
       <View style={styles.stageTextContainer}>
         <Text style={styles.stageText}>Stage {stageNumber}</Text>
       </View>
@@ -44,6 +46,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     backgroundColor: 'lightgray',
     padding: 10,
+    height: 50,
   },
   backButton: {
     padding: 10,
