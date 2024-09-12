@@ -3,7 +3,9 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, useWindowD
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const Introduction = ({ navigation }) => {
-  const { width, height } = useWindowDimensions();
+  const { width: windowWidth, height } = useWindowDimensions();
+  const maxWidth = 480; // Maximum width for mobile/tablet look
+  const width = Math.min(windowWidth, maxWidth);
 
   const stages = [
     {
@@ -22,64 +24,70 @@ const Introduction = ({ navigation }) => {
   ];
 
   return (
-    <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false}>
-      {stages.map((stage, index) => (
-        <View key={index} style={[styles.stage, { width, height }]}>
-          <View style={styles.header}>
-            <Icon name="bars" size={24} color="#000" />
-            <Text style={styles.stageNumber}>Stage {stage.number.toString().padStart(2, '0')}</Text>
-            <View style={{ width: 24 }} /> {/* Placeholder for symmetry */}
-          </View>
-          
-          <View style={styles.questionContainer}>
-            <Text style={styles.question}>{stage.question}</Text>
-          </View>
-          
-          <View style={styles.speakersContainer}>
-            <Text style={styles.speakersLabel}>Speakers</Text>
-            {stage.speakers.map((speaker, idx) => (
-              <View key={idx} style={styles.speakerItem}>
-                <Image source={speaker.image} style={styles.speakerImage} />
-                <Text style={styles.speakerName}>{speaker.name}</Text>
-              </View>
-            ))}
-            <View style={styles.failedContainer}>
-              <Text style={styles.failedLabel}>Failed</Text>
-              <Text style={styles.failedTimes}>{stage.failedTimes.toString().padStart(2, '0')}</Text>
-              <Text style={styles.failedLabel}>Times</Text>
+    <View style={styles.container}>
+      <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false}>
+        {stages.map((stage, index) => (
+          <View key={index} style={[styles.stage, { width, height }]}>
+            <View style={styles.header}>
+              <Icon name="bars" size={24} color="#000" />
+              <Text style={styles.stageNumber}>Stage {stage.number.toString().padStart(2, '0')}</Text>
+              <View style={{ width: 24 }} /> {/* Placeholder for symmetry */}
             </View>
-          </View>
-          
-          <View style={styles.infoContainer}>
-            <View style={styles.infoItem}>
-              <Text style={styles.infoLabel}>Time {stage.time}</Text>
+            
+            <View style={styles.questionContainer}>
+              <Text style={styles.question}>{stage.question}</Text>
             </View>
-            <View style={styles.infoItem}>
-              <Text style={styles.infoLabel}>Difficulty</Text>
-              <View style={styles.difficultyStars}>
-                {[...Array(5)].map((_, i) => (
-                  <Icon key={i} name="star" size={16} color={i < stage.difficulty ? "#FFD700" : "#D3D3D3"} />
-                ))}
+            
+            <View style={styles.speakersContainer}>
+              <Text style={styles.speakersLabel}>Speakers</Text>
+              {stage.speakers.map((speaker, idx) => (
+                <View key={idx} style={styles.speakerItem}>
+                  <Image source={speaker.image} style={styles.speakerImage} />
+                  <Text style={styles.speakerName}>{speaker.name}</Text>
+                </View>
+              ))}
+              <View style={styles.failedContainer}>
+                <Text style={styles.failedLabel}>Failed</Text>
+                <Text style={styles.failedTimes}>{stage.failedTimes.toString().padStart(2, '0')}</Text>
+                <Text style={styles.failedLabel}>Times</Text>
               </View>
             </View>
+            
+            <View style={styles.infoContainer}>
+              <View style={styles.infoItem}>
+                <Text style={styles.infoLabel}>Time {stage.time}</Text>
+              </View>
+              <View style={styles.infoItem}>
+                <Text style={styles.infoLabel}>Difficulty</Text>
+                <View style={styles.difficultyStars}>
+                  {[...Array(5)].map((_, i) => (
+                    <Icon key={i} name="star" size={16} color={i < stage.difficulty ? "#FFD700" : "#D3D3D3"} />
+                  ))}
+                </View>
+              </View>
+            </View>
+            
+            <Text style={styles.context}>{stage.context}</Text>
+            
+            <TouchableOpacity
+              style={styles.startButton}
+              onPress={() => navigation.navigate('Listening', { stageNumber: stage.number })}
+            >
+              <Text style={styles.startButtonText}>Start Listening</Text>
+              <Icon name="chevron-right" size={18} color="#fff" />
+            </TouchableOpacity>
           </View>
-          
-          <Text style={styles.context}>{stage.context}</Text>
-          
-          <TouchableOpacity
-            style={styles.startButton}
-            onPress={() => navigation.navigate('Listening', { stageNumber: stage.number })}
-          >
-            <Text style={styles.startButtonText}>Start Listening</Text>
-            <Icon name="chevron-right" size={18} color="#fff" />
-          </TouchableOpacity>
-        </View>
-      ))}
-    </ScrollView>
+        ))}
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+  },
   stage: {
     backgroundColor: '#F0F0F0',
     padding: 20,
