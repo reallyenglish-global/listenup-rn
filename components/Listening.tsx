@@ -7,18 +7,9 @@ import { Audio } from 'expo-av';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import Speakers from './Speakers';
-
-// Assuming you have a RootStackParamList defined somewhere in your app
-type RootStackParamList = {
-  Introduction: undefined;
-  Listening: undefined;
-  // ... other screens
-};
-
-type ListeningScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Listening'>;
+import HeaderBar from './HeaderBar';
 
 const Listening = () => {
-  const navigation = useNavigation<ListeningScreenNavigationProp>();
   const [session, setSession] = useState(new ListeningSession());
   const [isPlaying, setIsPlaying] = useState(false);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
@@ -118,21 +109,9 @@ const Listening = () => {
     return `${minutes}:${(Number(seconds) < 10 ? '0' : '')}${seconds}`;
   };
 
-  const handleHomePress = () => {
-    navigation.navigate('Introduction');
-  };
-
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={handleHomePress}>
-          <Text style={styles.backButtonText}>← Home</Text>
-        </TouchableOpacity>
-        <View style={styles.stageTextContainer}>
-          <Text style={styles.stageText}>Stage {session.getCurrentStageNumber()}</Text>
-        </View>
-        <View style={styles.placeholder} />
-      </View>
+      <HeaderBar stageNumber={session.getCurrentStageNumber()} />
 
       <Speakers
         speakers={currentStage.speakers}
