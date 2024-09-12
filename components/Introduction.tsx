@@ -3,9 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, useWindowD
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const Introduction = ({ navigation }) => {
-  const { width: windowWidth, height } = useWindowDimensions();
-  const maxWidth = 480; // Maximum width for mobile/tablet look
-  const width = Math.min(windowWidth, maxWidth);
+  const { width, height } = useWindowDimensions();
 
   const stages = [
     {
@@ -24,10 +22,10 @@ const Introduction = ({ navigation }) => {
   ];
 
   return (
-    <View style={styles.container}>
-      <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false}>
+    <View style={[styles.container, { width, height }]}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         {stages.map((stage, index) => (
-          <View key={index} style={[styles.stage, { width, height }]}>
+          <View key={index} style={styles.stage}>
             <View style={styles.header}>
               <Icon name="bars" size={24} color="#000" />
               <Text style={styles.stageNumber}>Stage {stage.number.toString().padStart(2, '0')}</Text>
@@ -67,18 +65,19 @@ const Introduction = ({ navigation }) => {
               </View>
             </View>
             
-            <Text style={styles.context}>{stage.context}</Text>
-            
-            <TouchableOpacity
-              style={styles.startButton}
-              onPress={() => navigation.navigate('Listening', { stageNumber: stage.number })}
-            >
-              <Text style={styles.startButtonText}>Start Listening</Text>
-              <Icon name="chevron-right" size={18} color="#fff" />
-            </TouchableOpacity>
+            <View style={styles.contextContainer}>
+              <Text style={styles.context}>{stage.context}</Text>
+            </View>
           </View>
         ))}
       </ScrollView>
+      <TouchableOpacity
+        style={styles.startButton}
+        onPress={() => navigation.navigate('Listening', { stageNumber: stages[0].number })}
+      >
+        <Text style={styles.startButtonText}>Start Listening</Text>
+        <Icon name="chevron-right" size={18} color="#fff" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -86,11 +85,14 @@ const Introduction = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
+    backgroundColor: '#F0F0F0',
+  },
+  scrollContent: {
+    flexGrow: 1,
+    padding: 20,
   },
   stage: {
-    backgroundColor: '#F0F0F0',
-    padding: 20,
+    flex: 1,
   },
   header: {
     flexDirection: 'row',
@@ -167,9 +169,15 @@ const styles = StyleSheet.create({
   difficultyStars: {
     flexDirection: 'row',
   },
+  contextContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
   context: {
     textAlign: 'center',
-    marginBottom: 20,
+    fontSize: 18,
+    lineHeight: 24,
   },
   startButton: {
     flexDirection: 'row',
@@ -179,6 +187,8 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
+    marginHorizontal: 20,
+    marginBottom: 20,
   },
   startButtonText: {
     color: '#fff',
