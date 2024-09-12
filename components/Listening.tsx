@@ -12,6 +12,7 @@ const Listening = () => {
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
   const progressUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -32,6 +33,7 @@ const Listening = () => {
       const status = await sound.getStatusAsync();
       if (status.isLoaded) {
         setProgress(status.positionMillis / status.durationMillis);
+        setCurrentTime(status.positionMillis);
         setDuration(status.durationMillis);
       }
     }
@@ -41,8 +43,10 @@ const Listening = () => {
     if (sound) {
       const status = await sound.getStatusAsync();
       if (status.isLoaded) {
-        await sound.setPositionAsync(value * status.durationMillis);
+        const newPosition = value * status.durationMillis;
+        await sound.setPositionAsync(newPosition);
         setProgress(value);
+        setCurrentTime(newPosition);
       }
     }
   };
@@ -56,7 +60,7 @@ const Listening = () => {
         }
       } else {
         await sound.playAsync();
-        progressUpdateIntervalRef.current = setInterval(updateProgress, 1000);
+        progressUpdateIntervalRef.current = setInterval(updateProgress, 100); // Update more frequently
       }
       setIsPlaying(!isPlaying);
     } else {
@@ -66,13 +70,20 @@ const Listening = () => {
       );
       setSound(newSound);
       setIsPlaying(true);
-      progressUpdateIntervalRef.current = setInterval(updateProgress, 1000);
+      progressUpdateIntervalRef.current = setInterval(updateProgress, 100); // Update more frequently
       newSound.setOnPlaybackStatusUpdate((status) => {
-        if (status.isLoaded && status.didJustFinish) {
-          setIsPlaying(false);
-          setProgress(0);
-          if (progressUpdateIntervalRef.current) {
-            clearInterval(progressUpdateIntervalRef.current);
+        if (status.isLoaded) {
+          if (status.didJustFinish) {
+            setIsPlaying(false);
+            setProgress(0);
+            setCurrentTime(0);
+            if (progressUpdateIntervalRef.current) {
+              clearInterval(progressUpdateIntervalRef.current);
+            }
+          } else {
+            setProgress(status.positionMillis / status.durationMillis);
+            setCurrentTime(status.positionMillis);
+            setDuration(status.durationMillis);
           }
         }
       });
@@ -113,7 +124,7 @@ const Listening = () => {
       </View>
 
       <View style={styles.progressBarContainer}>
-        <Text style={styles.timeText}>{formatTime(progress)}</Text>
+        <Text style={styles.timeText}>{formatTime(currentTime)}</Text>
         <Slider
           style={styles.progressBar}
           minimumValue={0}
@@ -124,7 +135,7 @@ const Listening = () => {
           maximumTrackTintColor="#d3d3d3"
           thumbTintColor="#3498db"
         />
-        <Text style={styles.timeText}>{currentStage.duration}</Text>
+        <Text style={styles.timeText}>{formatTime(duration)}</Text>
       </View>
 
       <View style={styles.controlsContainer}>
