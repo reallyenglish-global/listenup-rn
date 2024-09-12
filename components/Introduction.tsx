@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, useWindowDimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Speakers from './Speakers';
+import FailedTimes from './FailedTimes';
 import { ListeningSession } from '@/services/ListeningSession';
 import HeaderBar from './HeaderBar';
 import StageTitle from './StageTitle';
@@ -16,21 +17,15 @@ const Introduction = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {stages.slice(0, 1).map((stage, index) => (
           <View key={index} style={styles.stage}>
-
             <HeaderBar stageNumber={stage.number} />
             
             <StageTitle title={stage.title} />
             
             <View style={styles.speakersContainer}>
-              <Text style={styles.speakersLabel}>Speakers</Text>
               <Speakers
                 speakers={stage.speakers}
               />
-              <View style={styles.failedContainer}>
-                <Text style={styles.failedLabel}>Failed</Text>
-                <Text style={styles.failedTimes}>{stage.failedTimes.toString().padStart(2, '0')}</Text>
-                <Text style={styles.failedLabel}>Times</Text>
-              </View>
+              <FailedTimes failedTimes={stage.failedTimes} />
             </View>
             
             <View style={styles.infoContainer}>
@@ -99,16 +94,6 @@ const styles = StyleSheet.create({
   },
   speakerName: {
     marginTop: 5,
-  },
-  failedContainer: {
-    alignItems: 'center',
-  },
-  failedLabel: {
-    fontSize: 12,
-  },
-  failedTimes: {
-    fontSize: 24,
-    fontWeight: 'bold',
   },
   infoContainer: {
     flexDirection: 'row',
