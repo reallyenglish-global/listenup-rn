@@ -4,8 +4,20 @@ import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { ListeningSession } from '@/services/ListeningSession';
 import { Audio } from 'expo-av';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+
+// Assuming you have a RootStackParamList defined somewhere in your app
+type RootStackParamList = {
+  Introduction: undefined;
+  Listening: undefined;
+  // ... other screens
+};
+
+type ListeningScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Listening'>;
 
 const Listening = () => {
+  const navigation = useNavigation<ListeningScreenNavigationProp>();
   const [session, setSession] = useState(new ListeningSession());
   const [isPlaying, setIsPlaying] = useState(false);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
@@ -105,10 +117,14 @@ const Listening = () => {
     return `${minutes}:${(Number(seconds) < 10 ? '0' : '')}${seconds}`;
   };
 
+  const handleHomePress = () => {
+    navigation.navigate('Introduction');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
+        <TouchableOpacity style={styles.backButton} onPress={handleHomePress}>
           <Text style={styles.backButtonText}>← Home</Text>
         </TouchableOpacity>
         <View style={styles.stageTextContainer}>
