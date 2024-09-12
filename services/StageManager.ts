@@ -28,7 +28,7 @@ export class StageManager {
         name: speaker.name,
         image: `../assets/images/speakers/${speaker.image}.png`
       })),
-      audio: `../assets/audios/s1/S${index + 1}.mp3`,
+      audioUrl: `../assets/audios/s1/S${index + 1}.mp3`,
       duration: stage.duration
     }));
   }

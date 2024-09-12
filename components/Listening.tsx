@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -10,38 +10,72 @@ const Listening = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
+  const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const progressUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    return sound
-      ? () => {
-          sound.unloadAsync();
-        }
-      : undefined;
+    return () => {
+      if (sound) {
+        sound.unloadAsync();
+      }
+      if (progressUpdateIntervalRef.current) {
+        clearInterval(progressUpdateIntervalRef.current);
+      }
+    };
   }, [sound]);
 
   const currentStage = session.getCurrentStage();
 
-  const handleProgressChange = (progress: number) => {
-    const newSession = new ListeningSession();
-    session.setProgress(progress);
+  const updateProgress = async () => {
+    if (sound) {
+      const status = await sound.getStatusAsync();
+      if (status.isLoaded) {
+        setProgress(status.positionMillis / status.durationMillis);
+        setDuration(status.durationMillis);
+      }
+    }
+  };
+
+  const handleProgressChange = async (value: number) => {
+    if (sound) {
+      const status = await sound.getStatusAsync();
+      if (status.isLoaded) {
+        await sound.setPositionAsync(value * status.durationMillis);
+        setProgress(value);
+      }
+    }
   };
 
   const handlePlayPress = async () => {
     if (sound) {
       if (isPlaying) {
         await sound.pauseAsync();
+        if (progressUpdateIntervalRef.current) {
+          clearInterval(progressUpdateIntervalRef.current);
+        }
       } else {
         await sound.playAsync();
+        progressUpdateIntervalRef.current = setInterval(updateProgress, 1000);
       }
       setIsPlaying(!isPlaying);
     } else {
-      console.log('=======', currentStage.audio);
       const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: currentStage.audio },
+        { uri: currentStage.audioUrl },
         { shouldPlay: true }
       );
       setSound(newSound);
       setIsPlaying(true);
+      progressUpdateIntervalRef.current = setInterval(updateProgress, 1000);
+      newSound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded && status.didJustFinish) {
+          setIsPlaying(false);
+          setProgress(0);
+          if (progressUpdateIntervalRef.current) {
+            clearInterval(progressUpdateIntervalRef.current);
+          }
+        }
+      });
     }
   };
 
@@ -50,6 +84,12 @@ const Listening = () => {
     if (sound) {
       await sound.setRateAsync(speed, true);
     }
+  };
+
+  const formatTime = (millis: number) => {
+    const minutes = Math.floor(millis / 60000);
+    const seconds = ((millis % 60000) / 1000).toFixed(0);
+    return `${minutes}:${(Number(seconds) < 10 ? '0' : '')}${seconds}`;
   };
 
   return (
@@ -73,14 +113,12 @@ const Listening = () => {
       </View>
 
       <View style={styles.progressBarContainer}>
-        <Text style={styles.timeText}>
-          {session.getProgressTime()}
-        </Text>
+        <Text style={styles.timeText}>{formatTime(progress)}</Text>
         <Slider
           style={styles.progressBar}
           minimumValue={0}
           maximumValue={1}
-          value={session.getProgress()}
+          value={progress}
           onValueChange={handleProgressChange}
           minimumTrackTintColor="#3498db"
           maximumTrackTintColor="#d3d3d3"
