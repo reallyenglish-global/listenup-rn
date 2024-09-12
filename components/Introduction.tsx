@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    padding: 20,
+    padding: 0,
   },
   stage: {
     flex: 1,
