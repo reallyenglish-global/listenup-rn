@@ -11,7 +11,7 @@ const Test = ({ route, navigation }) => {
     if (currentQuestionIndex < stage.questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      navigation.navigate('Results');
+      navigation.navigate('TranscriptReview');
     }
   };
 

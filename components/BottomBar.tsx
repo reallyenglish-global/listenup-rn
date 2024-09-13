@@ -15,9 +15,10 @@ type BottomBarNavigationProp = StackNavigationProp<RootStackParamList, 'Introduc
 interface BottomBarProps {
   title: string;
   target: string;
+  showNext?: boolean;
 }
 
-const BottomBar: React.FC<BottomBarProps> = ({ title, target }) => {
+const BottomBar: React.FC<BottomBarProps> = ({ title, target, showNext=true }) => {
   const navigation = useNavigation<BottomBarNavigationProp>();
 
   const handleStartListening = () => {
@@ -28,7 +29,7 @@ const BottomBar: React.FC<BottomBarProps> = ({ title, target }) => {
     <View style={styles.bottomBar}>
       <TouchableOpacity style={styles.startButton} onPress={handleStartListening}>
         <Text style={styles.startButtonText}>{ title }</Text>
-        <Icon name="chevron-right" size={18} color="#fff" />
+        { showNext && (<Icon name="chevron-right" size={18} color="#fff" />)}
       </TouchableOpacity>
     </View>
   );

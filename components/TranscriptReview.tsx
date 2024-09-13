@@ -4,6 +4,7 @@ import Slider from '@react-native-community/slider';
 import { ListeningSession } from '../services/ListeningSession';
 import HeaderBar from './HeaderBar';
 import { AudioPlayer } from './AudioPlayer';
+import BottomBar from './BottomBar';
 const TranscriptReview = ({ navigation, route }) => {
   const stage = new ListeningSession().getCurrentStage();
 
@@ -22,9 +23,7 @@ const TranscriptReview = ({ navigation, route }) => {
         <Text style={styles.transcriptText}>{stage.transcript}</Text>
       </ScrollView>
 
-      <TouchableOpacity style={styles.doneButton} onPress={() => navigation.goBack()}>
-        <Text>Done</Text>
-      </TouchableOpacity>
+      <BottomBar title="Done" target="Introduction" showNext={false}/>
     </View>
   );
 };
