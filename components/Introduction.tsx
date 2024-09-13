@@ -6,6 +6,8 @@ import FailedTimes from './FailedTimes';
 import { ListeningSession } from '@/services/ListeningSession';
 import HeaderBar from './HeaderBar';
 import StageTitle from './StageTitle';
+import BottomBar from './BottomBar';
+
 const Introduction = ({ navigation }) => {
   const { width, height } = useWindowDimensions();
 
@@ -17,19 +19,18 @@ const Introduction = ({ navigation }) => {
   return (
     <View style={[styles.container, { width, height }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {stages.slice(-3, -2).map((stage, index) => (
+        {stages.slice(0, 1).map((stage, index) => (
           <View key={index} style={styles.stage}>
             <HeaderBar title={"Stage " + stage.number} />
-            
+
             <StageTitle title={stage.title} />
-            
             <View style={styles.speakersContainer}>
               <Speakers
                 speakers={stage.speakers}
               />
               <FailedTimes failedTimes={stage.failedTimes} height={SPEAKER_IMAGE_HEIGHT} />
             </View>
-            
+
             <View style={styles.infoContainer}>
               <View style={styles.infoItem}>
                 <Text style={styles.infoLabel}>Time {stage.time}</Text>
@@ -50,13 +51,7 @@ const Introduction = ({ navigation }) => {
           </View>
         ))}
       </ScrollView>
-      <TouchableOpacity
-        style={styles.startButton}
-        onPress={() => navigation.navigate('Listening', { stageNumber: stages[0].number })}
-      >
-        <Text style={styles.startButtonText}>Start Listening</Text>
-        <Icon name="chevron-right" size={18} color="#fff" />
-      </TouchableOpacity>
+      <BottomBar title="Start Listening" target="Listening" />
     </View>
   );
 };

@@ -4,12 +4,11 @@ import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { ListeningSession } from '@/services/ListeningSession';
 import { Audio } from 'expo-av';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
 import Speakers from './Speakers';
 import HeaderBar from './HeaderBar';
 import StageTitle from './StageTitle';
 import { AudioPlayer, useAudioPlayer } from './AudioPlayer';
+import BottomBar from './BottomBar';
 
 const Listening = () => {
   const [session, setSession] = useState(new ListeningSession());
@@ -34,17 +33,6 @@ const Listening = () => {
   }, [sound]);
 
   const currentStage = session.getCurrentStage();
-
-  const updateProgress = async () => {
-    if (sound) {
-      const status = await sound.getStatusAsync();
-      if (status.isLoaded) {
-        setProgress(status.positionMillis / status.durationMillis);
-        setCurrentTime(status.positionMillis);
-        setDuration(status.durationMillis);
-      }
-    }
-  };
 
   const handleSpeedChange = async (speed: number) => {
     setPlaybackSpeed(speed);
@@ -100,13 +88,7 @@ const Listening = () => {
           thumbTintColor="#3498db"
         />
       </View>
-
-      <View style={styles.bottomContainer}>
-        <TouchableOpacity style={styles.challengeButton}>
-          <Text style={styles.challengeButtonText}>Challenge!</Text>
-          <Icon name="chevron-right" size={20} color="#3498db" />
-        </TouchableOpacity>
-      </View>
+      <BottomBar title="Challenge" target="Test" />
     </SafeAreaView>
   );
 };
@@ -115,7 +97,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F0F0F0',
-    padding: 10,
   },
   header: {
     flexDirection: 'row',
@@ -225,10 +206,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#000',
     marginBottom: 10,
-  },
-  bottomContainer: {
-    alignItems: 'center',
-    marginBottom: 20,
   },
   speedControlContainer: {
     alignItems: 'center',
