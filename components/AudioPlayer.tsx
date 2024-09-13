@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Slider from '@react-native-community/slider';
-import TrackPlayer, { useProgress, usePlaybackState } from 'react-native-track-player';
+import TrackPlayer, { State, useProgress, usePlaybackState } from 'react-native-track-player';
+import PlayButton from './PlayButton';
 
 interface AudioPlayerProps {
   audioUrl: string;
@@ -20,7 +21,9 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
 }) => {
   const progress = useProgress();
   const playbackState = usePlaybackState();
+
   const [isReady, setIsReady] = useState(false);
+  const [playSpeed, setPlaySpeed] = useState(1);
 
   useEffect(() => {
     setupPlayer();
@@ -31,6 +34,17 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
       onProgressChange(progress.position / progress.duration);
     }
   }, [progress]);
+
+  // when play speed changes, set the playback state
+  useEffect(() => {
+    const adjustPlaybackRate = async () => {
+      if (isReady) {
+        await TrackPlayer.setRate(playSpeed);
+      }
+    };
+
+    adjustPlaybackRate();
+  }, [playSpeed]);
 
   const setupPlayer = async () => {
     try {
@@ -47,9 +61,11 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   };
 
   const togglePlayPause = async () => {
-    if (playbackState === TrackPlayer.STATE_PLAYING) {
+    if (playbackState.state === State.Playing) {
+      console.log('Pausing audio');
       await TrackPlayer.pause();
     } else {
+      console.log('Playing audio');
       await TrackPlayer.play();
     }
   };
@@ -68,11 +84,9 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
 
   return (
     <View style={[styles.container, containerStyle]}>
-      <TouchableOpacity onPress={togglePlayPause}>
-        <Text style={[styles.playPauseText, textStyle]}>
-          {playbackState === TrackPlayer.STATE_PLAYING ? 'Pause' : 'Play'}
-        </Text>
-      </TouchableOpacity>
+      <View style={styles.controlsContainer}>
+        <PlayButton onPress={togglePlayPause} isPlaying={playbackState.state === State.Playing} />
+      </View>
       <Slider
         style={[styles.slider, sliderStyle]}
         minimumValue={0}
@@ -98,11 +112,14 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 10,
   },
-  playPauseText: {
-    fontSize: 16,
-  },
   timeText: {
     fontSize: 12,
+  },
+  controlsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 10,
   },
 });
 
