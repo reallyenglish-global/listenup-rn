@@ -3,16 +3,22 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-nati
 import Slider from '@react-native-community/slider';
 import { ListeningSession } from '../services/ListeningSession';
 import HeaderBar from './HeaderBar';
+import { AudioPlayer } from './AudioPlayer';
 const TranscriptReview = ({ navigation, route }) => {
   const stage = new ListeningSession().getCurrentStage();
 
   return (
     <View style={styles.container}>
-      <HeaderBar stageNumber={stage.number} />
+      <HeaderBar stageNumber={stage.stageNumber} />
+      <View style={styles.container}>
+        <AudioPlayer
+          audioUrl={stage.audioUrl}
+          containerStyle={styles.audioPlayerContainer}
+          sliderStyle={styles.audioPlayerSlider}
+          textStyle={styles.audioPlayerText}
+        />
+      </View>
       <ScrollView style={styles.transcriptContainer}>
-        {/* Map through transcript lines and render them */}
-        {/* Implement logic to highlight current line */}
-        {/* respect line breaks */}
         <Text style={styles.transcriptText}>{stage.transcript}</Text>
       </ScrollView>
 
@@ -25,8 +31,19 @@ const TranscriptReview = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
+    // Your container styles
+  },
+  title: {
+    // Title styles
+  },
+  audioPlayerContainer: {
+    // Custom styles for TranscriptReview view
+  },
+  audioPlayerSlider: {
+    // Custom slider styles for TranscriptReview view
+  },
+  audioPlayerText: {
+    // Custom text styles for TranscriptReview view
   },
   transcriptContainer: {
     flex: 1,

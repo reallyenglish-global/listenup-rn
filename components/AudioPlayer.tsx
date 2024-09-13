@@ -1,50 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import Slider from '@react-native-community/slider';
 import TrackPlayer, { State, useProgress, usePlaybackState } from 'react-native-track-player';
 import PlayButton from './PlayButton';
 
 interface AudioPlayerProps {
   audioUrl: string;
+  showControls?: boolean;
   onProgressChange?: (progress: number) => void;
   containerStyle?: object;
   sliderStyle?: object;
   textStyle?: object;
 }
 
-const AudioPlayer: React.FC<AudioPlayerProps> = ({
-  audioUrl,
-  onProgressChange,
-  containerStyle,
-  sliderStyle,
-  textStyle
-}) => {
-  const progress = useProgress();
-  const playbackState = usePlaybackState();
-
+// Custom hook to manage audio player state and functions
+const useAudioPlayer = (audioUrl: string) => {
   const [isReady, setIsReady] = useState(false);
   const [playSpeed, setPlaySpeed] = useState(1);
+  const progress = useProgress();
+  const playbackState = usePlaybackState();
 
   useEffect(() => {
     setupPlayer();
   }, []);
 
   useEffect(() => {
-    if (onProgressChange) {
-      onProgressChange(progress.position / progress.duration);
-    }
-  }, [progress]);
-
-  // when play speed changes, set the playback state
-  useEffect(() => {
     const adjustPlaybackRate = async () => {
       if (isReady) {
         await TrackPlayer.setRate(playSpeed);
       }
     };
-
     adjustPlaybackRate();
-  }, [playSpeed]);
+  }, [playSpeed, isReady]);
 
   const setupPlayer = async () => {
     try {
@@ -60,7 +47,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     }
   };
 
-  const togglePlayPause = async () => {
+  const togglePlayPause = useCallback(async () => {
     if (playbackState.state === State.Playing) {
       console.log('Pausing audio');
       await TrackPlayer.pause();
@@ -68,11 +55,48 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
       console.log('Playing audio');
       await TrackPlayer.play();
     }
-  };
+  }, [playbackState.state]);
 
   const seekAudio = async (value: number) => {
     await TrackPlayer.seekTo(value * progress.duration);
   };
+
+  const setSpeed = (speed: number) => {
+    setPlaySpeed(speed);
+  };
+
+  return {
+    isReady,
+    progress,
+    playbackState,
+    playSpeed,
+    togglePlayPause,
+    seekAudio,
+    setSpeed
+  };
+};
+
+const AudioPlayer: React.FC<AudioPlayerProps> = ({
+  audioUrl,
+  showControls = true,
+  onProgressChange,
+  containerStyle,
+  sliderStyle,
+  textStyle
+}) => {
+  const {
+    isReady,
+    progress,
+    playbackState,
+    togglePlayPause,
+    seekAudio
+  } = useAudioPlayer(audioUrl);
+
+  useEffect(() => {
+    if (onProgressChange) {
+      onProgressChange(progress.position / progress.duration);
+    }
+  }, [progress, onProgressChange]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -84,9 +108,11 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
 
   return (
     <View style={[styles.container, containerStyle]}>
-      <View style={styles.controlsContainer}>
-        <PlayButton onPress={togglePlayPause} isPlaying={playbackState.state === State.Playing} />
-      </View>
+      {showControls && (
+        <View style={styles.controlsContainer}>
+          <PlayButton onPress={togglePlayPause} isPlaying={playbackState.state === State.Playing} />
+        </View>
+      )}
       <Text style={[styles.timeText, textStyle]}>
         {formatTime(progress.position)}
       </Text>
@@ -126,4 +152,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AudioPlayer;
+export { AudioPlayer, useAudioPlayer };

@@ -22,7 +22,7 @@ const PlayButton: React.FC<PlayButtonProps> = ({
       <View style={[styles.iconContainer, { width: size, height: size }]}>
         <Icon
           name={isPlaying ? 'pause' : 'play'}
-          size={size * 0.5}
+          size={size * 0.4}
           color={color}
         />
       </View>

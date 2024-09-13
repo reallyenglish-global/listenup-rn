@@ -9,6 +9,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import Speakers from './Speakers';
 import HeaderBar from './HeaderBar';
 import StageTitle from './StageTitle';
+import { AudioPlayer, useAudioPlayer } from './AudioPlayer';
 
 const Listening = () => {
   const [session, setSession] = useState(new ListeningSession());
@@ -19,6 +20,7 @@ const Listening = () => {
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const progressUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const { togglePlayPause, playbackState } = useAudioPlayer()
 
   useEffect(() => {
     return () => {
@@ -41,59 +43,6 @@ const Listening = () => {
         setCurrentTime(status.positionMillis);
         setDuration(status.durationMillis);
       }
-    }
-  };
-
-  const handleProgressChange = async (value: number) => {
-    if (sound) {
-      const status = await sound.getStatusAsync();
-      if (status.isLoaded) {
-        const newPosition = value * status.durationMillis;
-        await sound.setPositionAsync(newPosition);
-        setProgress(value);
-        setCurrentTime(newPosition);
-      }
-    }
-  };
-
-  const handlePlayPress = async () => {
-    if (sound) {
-      if (isPlaying) {
-        await sound.pauseAsync();
-        if (progressUpdateIntervalRef.current) {
-          clearInterval(progressUpdateIntervalRef.current);
-        }
-      } else {
-        await sound.playAsync();
-        progressUpdateIntervalRef.current = setInterval(updateProgress, 100); // Update more frequently
-      }
-      setIsPlaying(!isPlaying);
-    } else {
-      const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: currentStage.audioUrl },
-        { shouldPlay: true }
-      );
-      setSound(newSound);
-      setIsPlaying(true);
-      progressUpdateIntervalRef.current = setInterval(updateProgress, 100); // Update more frequently
-      newSound.setOnPlaybackStatusUpdate((status) => {
-        if (status.isLoaded) {
-          if (status.didJustFinish) {
-            setIsPlaying(false);
-            setProgress(0);
-            setCurrentTime(0);
-            if (progressUpdateIntervalRef.current) {
-              clearInterval(progressUpdateIntervalRef.current);
-            }
-            // Increment play count when audio finishes
-            session.incrementPlays();
-          } else {
-            setProgress(status.positionMillis / status.durationMillis);
-            setCurrentTime(status.positionMillis);
-            setDuration(status.durationMillis);
-          }
-        }
-      });
     }
   };
 
@@ -120,24 +69,17 @@ const Listening = () => {
         speakers={currentStage.speakers}
       />
 
-      <View style={styles.progressBarContainer}>
-        <Text style={styles.timeText}>{formatTime(currentTime)}</Text>
-        <Slider
-          style={styles.progressBar}
-          minimumValue={0}
-          maximumValue={1}
-          value={progress}
-          onValueChange={handleProgressChange}
-          minimumTrackTintColor="#3498db"
-          maximumTrackTintColor="#d3d3d3"
-          thumbTintColor="#3498db"
-        />
-        <Text style={styles.timeText}>{formatTime(duration)}</Text>
-      </View>
+      <AudioPlayer
+        audioUrl={currentStage.audioUrl}
+        showControls={false}
+        containerStyle={styles.audioPlayerContainer}
+        sliderStyle={styles.audioPlayerSlider}
+        textStyle={styles.audioPlayerText}
+      />
 
       <View style={styles.controlsContainer}>
-        <TouchableOpacity style={styles.playButton} onPress={handlePlayPress}>
-          <Icon name={isPlaying ? "pause" : "play"} size={50} color="#fff" />
+        <TouchableOpacity style={styles.playButton} onPress={togglePlayPause}>
+          <Icon name={playbackState.state == 'playing' ? "pause" : "play"} size={50} color="#fff" />
         </TouchableOpacity>
         <View style={styles.playsCounter}>
           <Text style={styles.playsText}>Plays {session.getPlays()}</Text>
