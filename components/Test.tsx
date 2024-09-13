@@ -1,41 +1,62 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { ListeningSession } from '@/services/ListeningSession';
 
 const Test = ({ route, navigation }) => {
-  const { stageNumber } = route.params;
+  const stage = new ListeningSession().getCurrentStage();
+  const [currentQuestionIndex, setCurrentQuestionIndex] = React.useState(0);
+  const currentQuestion = stage.questions[currentQuestionIndex];
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Test Stage {stageNumber}</Text>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate('Introduction')}
-      >
-        <Text style={styles.buttonText}>Back to Introduction</Text>
-      </TouchableOpacity>
-    </View>
+    <ScrollView style={styles.container}>
+      <Text style={styles.stageTitle}>{`Stage ${stage.number} - ${stage.title}`}</Text>
+      <Text style={styles.questionNumber}>Q{currentQuestionIndex + 1}</Text>
+      <Text style={styles.questionText}>{currentQuestion.text}</Text>
+      {currentQuestion.options.map((option, index) => (
+        <TouchableOpacity key={index} style={styles.optionButton}>
+          <Text style={styles.optionText}>{option}</Text>
+          <Text style={styles.arrowIcon}>{'>'}</Text>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#f5f5f5',
   },
-  title: {
-    fontSize: 24,
+  stageTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
     marginBottom: 20,
   },
-  button: {
-    backgroundColor: '#3498db',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 5,
+  questionNumber: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
-  buttonText: {
-    color: '#fff',
+  questionText: {
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  optionButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 15,
+    backgroundColor: 'white',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  optionText: {
+    fontSize: 16,
+  },
+  arrowIcon: {
     fontSize: 18,
+    color: '#888',
   },
 });
 

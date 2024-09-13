@@ -29,6 +29,7 @@ export class StageManager {
         name: speaker.name,
         imageUrl: `../assets/images/speakers/${speaker.image}@2x.png`
       })),
+      questions: stage.mcqs,
       audioUrl: `../assets/audios/s1/S${index + 1}.mp3`,
       failedTimes: 0,
       duration: stage.duration
