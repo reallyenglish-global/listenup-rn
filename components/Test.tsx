@@ -6,15 +6,24 @@ const Test = ({ route, navigation }) => {
   const stage = new ListeningSession().getCurrentStage();
   const [currentQuestionIndex, setCurrentQuestionIndex] = React.useState(0);
   const currentQuestion = stage.questions[currentQuestionIndex];
+  const handleOptionPress = (option: string) => {
+    console.log(option);
+    if (currentQuestionIndex < stage.questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    } else {
+      navigation.navigate('Results');
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
       <HeaderBar stageNumber={stage.number} />
       <Text style={styles.questionNumber}>Q{currentQuestionIndex + 1}</Text>
       <Text style={styles.questionText}>{currentQuestion.body}</Text>
-      {/* TODO: randomize options */}
       {currentQuestion.options.sort(() => Math.random() - 0.5).map((option, index) => (
-        <TouchableOpacity key={index} style={styles.optionButton}>
+        <TouchableOpacity key={index} style={styles.optionButton}
+          onPress={() => handleOptionPress(option)}
+        >
           <Text style={styles.optionText}>{option.split('|').sort(() => Math.random() - 0.5)[0]}</Text>
           <Text style={styles.arrowIcon}>{'>'}</Text>
         </TouchableOpacity>

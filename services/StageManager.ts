@@ -29,6 +29,8 @@ export class StageManager {
         name: speaker.name,
         imageUrl: `../assets/images/speakers/${speaker.image}@2x.png`
       })),
+      // replace line breaks with <br />
+      transcript: stage.transcript.replace(/\r/g, '\n'),
       questions: stage.mcqs,
       audioUrl: `../assets/audios/s1/S${index + 1}.mp3`,
       failedTimes: 0,
