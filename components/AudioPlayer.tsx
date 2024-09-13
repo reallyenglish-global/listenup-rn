@@ -87,6 +87,9 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
       <View style={styles.controlsContainer}>
         <PlayButton onPress={togglePlayPause} isPlaying={playbackState.state === State.Playing} />
       </View>
+      <Text style={[styles.timeText, textStyle]}>
+        {formatTime(progress.position)}
+      </Text>
       <Slider
         style={[styles.slider, sliderStyle]}
         minimumValue={0}
@@ -95,7 +98,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
         onSlidingComplete={seekAudio}
       />
       <Text style={[styles.timeText, textStyle]}>
-        {formatTime(progress.position)} / {formatTime(progress.duration)}
+        {formatTime(progress.duration)}
       </Text>
     </View>
   );
