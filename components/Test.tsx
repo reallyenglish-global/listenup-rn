@@ -1,26 +1,51 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { ListeningSession } from '@/services/ListeningSession';
+import { Challenge } from '@/services/Challenge';
 import HeaderBar from './HeaderBar';
+import Notification from './Notification';
+
 const Test = ({ route, navigation }) => {
   const stage = new ListeningSession().getCurrentStage();
+  const challenge = new Challenge(stage);
+  const questions = challenge.questions;
   const [currentQuestionIndex, setCurrentQuestionIndex] = React.useState(0);
-  const currentQuestion = stage.questions[currentQuestionIndex];
   const handleOptionPress = (option: string) => {
     console.log(option);
-    if (currentQuestionIndex < stage.questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    challenge.answer(currentQuestionIndex, option);
+    if (currentQuestionIndex === questions.length - 1) {
+      const passed = challenge.passed();
+      showNotification(challenge.response(), passed ? 'success' : 'error');
     } else {
-      navigation.navigate('TranscriptReview');
+      showNotification(challenge.response(), passed ? 'success' : 'error');
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
+    //navigation.navigate('TranscriptReview');
+  };
+
+  const [notification, setNotification] = useState(null);
+
+  const showNotification = (message, type) => {
+    setNotification({ message, type });
+  };
+
+  const hideNotification = () => {
+    setNotification(null);
   };
 
   return (
     <ScrollView style={styles.container}>
       <HeaderBar title={"Stage " + stage.number + " - Challenge"} />
       <Text style={styles.questionNumber}>Q{currentQuestionIndex + 1}</Text>
-      <Text style={styles.questionText}>{currentQuestion.body}</Text>
-      {currentQuestion.options.sort(() => Math.random() - 0.5).map((option, index) => (
+      <Text style={styles.questionText}>{questions[currentQuestionIndex].body}</Text>
+      {notification && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onClose={hideNotification}
+        />
+      )}
+      {questions[currentQuestionIndex].options.map((option, index) => (
         <TouchableOpacity key={index} style={styles.optionButton}
           onPress={() => handleOptionPress(option)}
         >

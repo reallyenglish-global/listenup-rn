@@ -24,6 +24,7 @@ export class StageManager {
     return data.stages.map((stage: any, index: number) => ({
       number: index + 1,
       title: stage.title,
+      responses: [stage.successMessage, stage.failureMessage],
       difficulty: stage.difficulty,
       context: stage.situation,
       speakers: stage.speakers.map((speaker: any) => ({
