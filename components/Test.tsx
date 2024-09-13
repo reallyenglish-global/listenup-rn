@@ -4,6 +4,7 @@ import { ListeningSession } from '@/services/ListeningSession';
 import { Challenge } from '@/services/Challenge';
 import HeaderBar from './HeaderBar';
 import Notification from './Notification';
+import PopupNotification from './PopupNotification';
 
 const Test = ({ route, navigation }) => {
   const stage = new ListeningSession().getCurrentStage();
@@ -15,10 +16,14 @@ const Test = ({ route, navigation }) => {
     challenge.answer(currentQuestionIndex, option);
     if (currentQuestionIndex === questions.length - 1) {
       const passed = challenge.passed();
-      showNotification(challenge.response(), passed ? 'success' : 'error');
+      if (passed) {
+        showNotification(challenge.response(), 'success');
+        navigation.navigate('TranscriptReview');
+      } else {
+        showNotification(challenge.response(), 'warning');
+      }
     } else {
-      showNotification(challenge.response(), passed ? 'success' : 'error');
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setCurrentQuestionIndex((currentQuestionIndex + 1) % questions.length);
     }
     //navigation.navigate('TranscriptReview');
   };
@@ -30,6 +35,12 @@ const Test = ({ route, navigation }) => {
   };
 
   const hideNotification = () => {
+    if (notification.type === 'success') {
+      navigation.navigate('TranscriptReview');
+    } else if (notification.type === 'warning') {
+      navigation.navigate('Introduction');
+    }
+
     setNotification(null);
   };
 
@@ -39,7 +50,7 @@ const Test = ({ route, navigation }) => {
       <Text style={styles.questionNumber}>Q{currentQuestionIndex + 1}</Text>
       <Text style={styles.questionText}>{questions[currentQuestionIndex].body}</Text>
       {notification && (
-        <Notification
+        <PopupNotification
           message={notification.message}
           type={notification.type}
           onClose={hideNotification}
