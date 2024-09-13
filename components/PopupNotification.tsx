@@ -77,15 +77,6 @@ const typeStyles = {
 const PopupNotification = ({ title, message, type, onClose }) => {
   const [isVisible, setIsVisible] = useState(true);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVisible(false);
-      setTimeout(onClose, 300); // Delay to allow fade-out animation
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, [onClose]);
-
   const handleClose = useCallback(() => {
     setIsVisible(false);
     setTimeout(onClose, 300); // Delay to allow fade-out animation
