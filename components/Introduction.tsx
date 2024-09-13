@@ -33,7 +33,7 @@ const Introduction = ({ navigation }) => {
 
             <View style={styles.infoContainer}>
               <View style={styles.infoItem}>
-                <Text style={styles.infoLabel}>Time {stage.time}</Text>
+                <Text style={styles.infoLabel}>Time {stage.duration}</Text>
               </View>
               <View style={styles.infoItem}>
                 <Text style={styles.infoLabel}>Difficulty</Text>
@@ -44,7 +44,7 @@ const Introduction = ({ navigation }) => {
                 </View>
               </View>
             </View>
-            
+
             <View style={styles.contextContainer}>
               <Text style={styles.context}>{stage.context}</Text>
             </View>
