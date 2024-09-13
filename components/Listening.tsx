@@ -12,25 +12,8 @@ import BottomBar from './BottomBar';
 
 const Listening = () => {
   const [session, setSession] = useState(new ListeningSession());
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
-  const [progress, setProgress] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
-  const progressUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const { togglePlayPause, playbackState } = useAudioPlayer()
-
-  useEffect(() => {
-    return () => {
-      if (sound) {
-        sound.unloadAsync();
-      }
-      if (progressUpdateIntervalRef.current) {
-        clearInterval(progressUpdateIntervalRef.current);
-      }
-    };
-  }, [sound]);
 
   const currentStage = session.getCurrentStage();
 
@@ -39,12 +22,6 @@ const Listening = () => {
     if (sound) {
       await sound.setRateAsync(speed, true);
     }
-  };
-
-  const formatTime = (millis: number) => {
-    const minutes = Math.floor(millis / 60000);
-    const seconds = ((millis % 60000) / 1000).toFixed(0);
-    return `${minutes}:${(Number(seconds) < 10 ? '0' : '')}${seconds}`;
   };
 
   return (

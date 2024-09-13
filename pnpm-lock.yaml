@@ -62,6 +62,9 @@ importers:
       react-native-screens:
         specifier: 3.31.1
         version: 3.31.1(react-native@0.74.5(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.79)(react@18.2.0))(react@18.2.0)
+      react-native-track-player:
+        specifier: ^4.1.1
+        version: 4.1.1(react-native@0.74.5(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.79)(react@18.2.0))(react@18.2.0)(shaka-player@4.11.2)
       react-native-web:
         specifier: ~0.19.10
         version: 0.19.12(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -90,18 +93,12 @@ importers:
       '@types/react-test-renderer':
         specifier: ^18.0.7
         version: 18.3.0
-      expo-av:
-        specifier: ^14.0.7
-        version: 14.0.7(expo@51.0.32(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2)))
       jest:
         specifier: ^29.2.1
         version: 29.7.0(@types/node@22.5.4)
       jest-expo:
         specifier: ~51.0.3
         version: 51.0.4(@babel/core@7.25.2)(jest@29.7.0(@types/node@22.5.4))(react@18.2.0)
-      react-native-track-player:
-        specifier: ^4.1.1
-        version: 4.1.1(react-native@0.74.5(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.79)(react@18.2.0))(react@18.2.0)(shaka-player@4.11.2)
       react-test-renderer:
         specifier: 18.2.0
         version: 18.2.0(react@18.2.0)
@@ -2287,11 +2284,6 @@ packages:
     peerDependencies:
       expo: '*'
 
-  expo-av@14.0.7:
-    resolution: {integrity: sha512-FvKZxyy+2/qcCmp+e1GTK3s4zH8ZO1RfjpqNxh7ARlS1oH8HPtk1AyZAMo52tHz3yQ3UIqxQ2YbI9CFb4065lA==}
-    peerDependencies:
-      expo: '*'
-
   expo-constants@16.0.2:
     resolution: {integrity: sha512-9tNY3OVO0jfiMzl7ngb6IOyR5VFzNoN5OOazUWoeGfmMqVB5kltTemRvKraK9JRbBKIw+SOYLEmF0sEqgFZ6OQ==}
     peerDependencies:
@@ -4140,7 +4132,6 @@ packages:
 
   shaka-player@4.11.2:
     resolution: {integrity: sha512-KhmEVHlxPn0XPY8uYd/83OVWCJoMZ6kgvZezPOu/HzTQJIh2DGarYMfWM1d9Mlz8WETP+c81W4GjawLR3strzQ==}
-    engines: {node: '>=14'}
 
   shallow-clone@3.0.1:
     resolution: {integrity: sha512-/6KqX+GVUdqPuPPd2LxDDxzX6CAbjJehAAOKlNpqqUpAqPM6HeL8f+o3a+JsyGjn2lv0WY8UsTgUJjU9Ok55NA==}
@@ -7928,10 +7919,6 @@ snapshots:
       md5-file: 3.2.3
     transitivePeerDependencies:
       - supports-color
-
-  expo-av@14.0.7(expo@51.0.32(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))):
-    dependencies:
-      expo: 51.0.32(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))
 
   expo-constants@16.0.2(expo@51.0.32(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))):
     dependencies:
