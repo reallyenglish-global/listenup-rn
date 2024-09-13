@@ -13,10 +13,10 @@ type RootStackParamList = {
 type HeaderBarNavigationProp = StackNavigationProp<RootStackParamList, 'Listening'>;
 
 interface HeaderBarProps {
-  stageNumber: number;
+  title: String;
 }
 
-const HeaderBar: React.FC<HeaderBarProps> = ({ stageNumber }) => {
+const HeaderBar: React.FC<HeaderBarProps> = ({ title }) => {
   const navigation = useNavigation<HeaderBarNavigationProp>();
 
   const handleHomePress = () => {
@@ -31,7 +31,7 @@ const HeaderBar: React.FC<HeaderBarProps> = ({ stageNumber }) => {
         </TouchableOpacity>
       )}
       <View style={styles.stageTextContainer}>
-        <Text style={styles.stageText}>Stage {stageNumber}</Text>
+        <Text style={styles.stageText}>{title}</Text>
       </View>
       <View style={styles.placeholder} />
     </View>

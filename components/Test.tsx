@@ -17,7 +17,7 @@ const Test = ({ route, navigation }) => {
 
   return (
     <ScrollView style={styles.container}>
-      <HeaderBar stageNumber={stage.number} />
+      <HeaderBar title={"Stage " + stage.number + " - Challenge"} />
       <Text style={styles.questionNumber}>Q{currentQuestionIndex + 1}</Text>
       <Text style={styles.questionText}>{currentQuestion.body}</Text>
       {currentQuestion.options.sort(() => Math.random() - 0.5).map((option, index) => (

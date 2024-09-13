@@ -19,7 +19,7 @@ const Introduction = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {stages.slice(-3, -2).map((stage, index) => (
           <View key={index} style={styles.stage}>
-            <HeaderBar stageNumber={stage.number} />
+            <HeaderBar title={"Stage " + stage.number} />
             
             <StageTitle title={stage.title} />
             

@@ -61,7 +61,7 @@ const Listening = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <HeaderBar stageNumber={session.getCurrentStageNumber()} />
+      <HeaderBar title={"Stage " + session.getCurrentStageNumber()} />
 
       <StageTitle title={currentStage.title} />
 

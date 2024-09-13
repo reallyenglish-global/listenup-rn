@@ -9,7 +9,7 @@ const TranscriptReview = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <HeaderBar stageNumber={stage.stageNumber} />
+      <HeaderBar title={"Stage " + stage.number + ' - Transcript'} />
       <View style={styles.container}>
         <AudioPlayer
           audioUrl={stage.audioUrl}
