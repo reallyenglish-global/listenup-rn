@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { ListeningSession } from '@/services/ListeningSession';
-
+import HeaderBar from './HeaderBar';
 const Test = ({ route, navigation }) => {
   const stage = new ListeningSession().getCurrentStage();
   const [currentQuestionIndex, setCurrentQuestionIndex] = React.useState(0);
@@ -9,12 +9,13 @@ const Test = ({ route, navigation }) => {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.stageTitle}>{`Stage ${stage.number} - ${stage.title}`}</Text>
+      <HeaderBar stageNumber={stage.number} />
       <Text style={styles.questionNumber}>Q{currentQuestionIndex + 1}</Text>
-      <Text style={styles.questionText}>{currentQuestion.text}</Text>
-      {currentQuestion.options.map((option, index) => (
+      <Text style={styles.questionText}>{currentQuestion.body}</Text>
+      {/* TODO: randomize options */}
+      {currentQuestion.options.sort(() => Math.random() - 0.5).map((option, index) => (
         <TouchableOpacity key={index} style={styles.optionButton}>
-          <Text style={styles.optionText}>{option}</Text>
+          <Text style={styles.optionText}>{option.split('|').sort(() => Math.random() - 0.5)[0]}</Text>
           <Text style={styles.arrowIcon}>{'>'}</Text>
         </TouchableOpacity>
       ))}
@@ -25,7 +26,7 @@ const Test = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 0,
     backgroundColor: '#f5f5f5',
   },
   stageTitle: {
@@ -34,12 +35,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   questionNumber: {
-    fontSize: 24,
+    fontSize: 80,
     fontWeight: 'bold',
+    textAlign: 'center',
     marginBottom: 10,
   },
   questionText: {
-    fontSize: 16,
+    fontSize: 26,
+    padding: 20,
     marginBottom: 20,
   },
   optionButton: {
