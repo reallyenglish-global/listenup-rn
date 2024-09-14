@@ -32,7 +32,6 @@ export class Challenge {
   }
 
   passed(): boolean {
-    console.log('=====', this.questions)
     return this.questions.every(question => question.correct);
   }
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, useWindowDimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Speakers from './Speakers';
@@ -12,15 +12,24 @@ const Introduction = ({ navigation }) => {
   const { width, height } = useWindowDimensions();
 
   const [session, setSession] = useState(new ListeningSession());
-  const stages = session.getAllStages();
+  const stage = session.getCurrentStage();
+  const currentStage = session.getCurrentStage();
 
   const SPEAKER_IMAGE_HEIGHT = 150; // Adjust this value to match your speaker image height
+
+  useEffect(() => {
+    const initializeSession = async () => {
+      await session.loadProgress();
+    };
+
+    initializeSession();
+  }, []);
+
 
   return (
     <View style={[styles.container, { width, height }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {stages.slice(0, 1).map((stage, index) => (
-          <View key={index} style={styles.stage}>
+          <View key={stage.number} style={styles.stage}>
             <HeaderBar title={"Stage " + stage.number} />
 
             <StageTitle title={stage.title} />
@@ -49,7 +58,6 @@ const Introduction = ({ navigation }) => {
               <Text style={styles.context}>{stage.context}</Text>
             </View>
           </View>
-        ))}
       </ScrollView>
       <BottomBar title="Start Listening" target="Listening" />
     </View>

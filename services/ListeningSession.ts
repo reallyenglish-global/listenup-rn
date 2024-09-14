@@ -1,99 +1,55 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StageManager, Stage } from './StageManager';
 
 export class ListeningSession {
+  private currentStage: Stage;
   private stageManager: StageManager;
-  private currentStageIndex: number;
-  private progress: number = 0;
-  private plays: number = 0;
 
   constructor() {
     this.stageManager = new StageManager();
-    this.currentStageIndex = 0;
-    this.progress = 0;
-    this.progressTime = 0;
-    this.durationTime = 0;
-    this.plays = 0;
-  }
-
-  getAllStages(): Stage[] {
-    return this.stageManager.getAllStages();
+    this.currentStage = this.stageManager.getStage(1);
   }
 
   getCurrentStage(): Stage {
-    return this.stageManager.getAllStages()[this.currentStageIndex];
+    return this.currentStage;
   }
 
-  getProgress(): number {
-    return this.progress;
-  }
-
-  // 00:12
-  getProgressTime(): string {
-    const second = this.progress * this.durationTime;
-    const minutes = Math.floor(second / 60);
-    const seconds = second % 60;
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  }
-
-  getCurrentStageTime(): string {
-    // convert 01:23 to seconds
-    const [minutes, seconds] = this.getCurrentStage().duration.split(':').map(Number);
-    return (minutes * 60) + seconds;
-  }
-
-  setProgress(progress: number): void {
-    this.progress = Math.max(0, Math.min(1, progress));
-  }
-
-  getPlays(): number {
-    return this.plays;
-  }
-
-  incrementPlays(): void {
-    this.plays++;
-  }
-
-  moveToNextStage(): boolean {
-    if (this.currentStageIndex < this.stageManager.getTotalStages() - 1) {
-      this.currentStageIndex++;
-      this.progress = 0;
-      this.plays = 0;
-      return true;
-    }
-    return false;
-  }
-
-  setCurrentStage(number: number): void {
-    if (number > 0) {
-      this.currentStageIndex = number;
-      this.progress = 0;
-      this.plays = 0;
-      this.progressTime = 0;
-      this.durationTime = this.getCurrentStageTime();
-      return true;
-    }
-    return false;
-  }
-
-  moveToPreviousStage(): boolean {
-    if (this.currentStageIndex > 0) {
-      this.currentStageIndex--;
-      this.progress = 0;
-      this.plays = 0;
-      return true;
-    }
-    return false;
-  }
-
-  isLastStage(): boolean {
-    return this.currentStageIndex === this.stageManager.getTotalStages() - 1;
+  getCurrentStageNumber(): number {
+    return this.currentStage.number;
   }
 
   getTotalStages(): number {
     return this.stageManager.getTotalStages();
   }
 
-  getCurrentStageNumber(): number {
-    return this.currentStageIndex + 1;
+  getAllStages(): Stage[] {
+    return this.stageManager.getAllStages();
+  }
+
+  async moveToNextStage(): Promise<void> {
+    const nextStageNumber = this.currentStage.number + 1;
+    this.currentStage = this.stageManager.getStage(nextStageNumber);
+    await this.saveProgress();
+  }
+
+  async saveProgress(): Promise<void> {
+    try {
+      await AsyncStorage.setItem('@current_stage', JSON.stringify(this.currentStage.number));
+    } catch (error) {
+      console.error('Error saving progress:', error);
+    }
+  }
+
+  async loadProgress(): Promise<void> {
+    try {
+      const savedStage = await AsyncStorage.getItem('@current_stage');
+      console.log('loaded stage', savedStage);
+      if (savedStage !== null) {
+        const stageNumber = JSON.parse(savedStage);
+        this.currentStage = this.stageManager.getStage(stageNumber);
+      }
+    } catch (error) {
+      console.error('Error loading progress:', error);
+    }
   }
 }

@@ -5,19 +5,38 @@ import { Challenge } from '@/services/Challenge';
 import HeaderBar from './HeaderBar';
 import PopupNotification from './PopupNotification';
 
-const Test = ({ route, navigation }) => {
+const Test = ({ navigation }) => {
   const [listeningSession] = useState(() => new ListeningSession());
-  const [challenge] = useState(() => new Challenge(listeningSession.getCurrentStage()));
-  const [questions, setQuestions] = useState(challenge.getQuestions());
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(challenge.getCurrentQuestionIndex());
+  const [challenge, setChallenge] = useState<Challenge | null>(null);
+  const [questions, setQuestions] = useState<any[]>([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [notification, setNotification] = useState(null);
 
-  const handleOptionPress = (option: string) => {
+  useEffect(() => {
+    const initializeSession = async () => {
+      await listeningSession.loadProgress();
+      const newChallenge = new Challenge(listeningSession.getCurrentStage());
+      setChallenge(newChallenge);
+      setQuestions(newChallenge.getQuestions());
+      setCurrentQuestionIndex(0);
+    };
+
+    initializeSession();
+  }, []);
+
+  const handleOptionPress = async (option: string) => {
+    if (!challenge) return;
+
     challenge.answer(currentQuestionIndex, option);
     if (currentQuestionIndex === questions.length - 1) {
       const passed = challenge.passed();
       if (passed) {
         showNotification(challenge.response(), 'success');
+        await listeningSession.moveToNextStage();
+        const newChallenge = new Challenge(listeningSession.getCurrentStage());
+        setChallenge(newChallenge);
+        setQuestions(newChallenge.getQuestions());
+        setCurrentQuestionIndex(0);
       } else {
         showNotification(challenge.response(), 'warning');
       }
@@ -42,6 +61,8 @@ const Test = ({ route, navigation }) => {
     }
     setNotification(null);
   };
+
+  if (!challenge) return null;
 
   return (
     <ScrollView style={styles.container}>
@@ -71,7 +92,6 @@ const Test = ({ route, navigation }) => {
     </ScrollView>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
