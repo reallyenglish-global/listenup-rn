@@ -1,44 +1,54 @@
-import { StageManager, Stage } from './StageManager';
+import { Stage } from './StageManager';
 
 export class Challenge {
-  constructor(stage) {
+  private questions: any[];
+  private responses: string[];
+  private currentQuestionIndex: number;
+
+  constructor(stage: Stage) {
     this.questions = stage.questions;
     this.responses = stage.responses;
     this.currentQuestionIndex = 0;
-    //this.shuffleQuestions();
+    this.initializeQuestions();
   }
 
-  shuffleQuestions(): void {
-    console.log('before shuffle', this.questions);
-    this.questions.map(question => {
-      question['correct'] = false;
-      question['answer'] = '';
-      question['correctAnswer'] = question.options[0];
-      console.log('question', question);
-      question['options'] = question.options.sort(() => Math.random() - 0.5)
+  private initializeQuestions(): void {
+    this.questions = this.questions.map(question => ({
+      ...question,
+      correct: false,
+      answer: '',
+      correctAnswer: question.options[0],
+      options: question.options
+        .sort(() => Math.random() - 0.5)
         .map(option => option.split('|').sort(() => Math.random() - 0.5)[0])
-    });
-    console.log('after shuffle', this.questions);
-    //this.questions = this.questions.sort(() => Math.random() - 0.5);
+    }));
+    //this.questions.sort(() => Math.random() - 0.5);
   }
 
-  answer(id, answer): boolean {
-    console.log('answer', id, answer);
+  answer(id: number, answer: string): void {
     let question = this.questions[id];
-    question['answer'] = answer;
-    question['correct'] = question.correctAnswer.indexOf(answer) > -1;
+    question.answer = answer;
+    question.correct = question.correctAnswer.indexOf(answer) > -1;
   }
 
   passed(): boolean {
-      console.log(this.questions, this.questions.filter(question => question['correct']));
-    this.questions.length == this.questions.filter(question => question['correct']).length;
+    console.log('=====', this.questions)
+    return this.questions.every(question => question.correct);
   }
 
   response(): string {
-    if (this.passed()) {
-      return this.responses[0];
-    } else {
-      return this.responses[1];
-    }
+    return this.passed() ? this.responses[0] : this.responses[1];
+  }
+
+  getQuestions(): any[] {
+    return this.questions;
+  }
+
+  getCurrentQuestionIndex(): number {
+    return this.currentQuestionIndex;
+  }
+
+  setCurrentQuestionIndex(index: number): void {
+    this.currentQuestionIndex = index;
   }
 }

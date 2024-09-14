@@ -21,13 +21,13 @@ interface BottomBarProps {
 const BottomBar: React.FC<BottomBarProps> = ({ title, target, showNext=true }) => {
   const navigation = useNavigation<BottomBarNavigationProp>();
 
-  const handleStartListening = () => {
+  const handleClick = () => {
     navigation.navigate(target);
   };
 
   return (
     <View style={styles.bottomBar}>
-      <TouchableOpacity style={styles.startButton} onPress={handleStartListening}>
+      <TouchableOpacity style={styles.startButton} onPress={handleClick}>
         <Text style={styles.startButtonText}>{ title }</Text>
         { showNext && (<Icon name="chevron-right" size={18} color="#fff" />)}
       </TouchableOpacity>

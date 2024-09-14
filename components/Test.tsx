@@ -1,34 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { ListeningSession } from '@/services/ListeningSession';
 import { Challenge } from '@/services/Challenge';
 import HeaderBar from './HeaderBar';
-import Notification from './Notification';
 import PopupNotification from './PopupNotification';
 
 const Test = ({ route, navigation }) => {
-  const stage = new ListeningSession().getCurrentStage();
-  const challenge = new Challenge(stage);
-  const questions = challenge.questions;
-  const [currentQuestionIndex, setCurrentQuestionIndex] = React.useState(0);
+  const [listeningSession] = useState(() => new ListeningSession());
+  const [challenge] = useState(() => new Challenge(listeningSession.getCurrentStage()));
+  const [questions, setQuestions] = useState(challenge.getQuestions());
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(challenge.getCurrentQuestionIndex());
+  const [notification, setNotification] = useState(null);
+
   const handleOptionPress = (option: string) => {
-    console.log(option);
     challenge.answer(currentQuestionIndex, option);
     if (currentQuestionIndex === questions.length - 1) {
       const passed = challenge.passed();
       if (passed) {
         showNotification(challenge.response(), 'success');
-        navigation.navigate('TranscriptReview');
       } else {
         showNotification(challenge.response(), 'warning');
       }
     } else {
-      setCurrentQuestionIndex((currentQuestionIndex + 1) % questions.length);
+      setCurrentQuestionIndex(prevIndex => {
+        const newIndex = (prevIndex + 1) % questions.length;
+        challenge.setCurrentQuestionIndex(newIndex);
+        return newIndex;
+      });
     }
-    //navigation.navigate('TranscriptReview');
   };
-
-  const [notification, setNotification] = useState(null);
 
   const showNotification = (message, type) => {
     setNotification({ message, type });
@@ -40,13 +40,12 @@ const Test = ({ route, navigation }) => {
     } else if (notification.type === 'warning') {
       navigation.navigate('Introduction');
     }
-
     setNotification(null);
   };
 
   return (
     <ScrollView style={styles.container}>
-      <HeaderBar title={"Stage " + stage.number + " - Challenge"} />
+      <HeaderBar title={`Stage ${listeningSession.getCurrentStage().number} - Challenge`} />
       <Text style={styles.questionNumber}>Q{currentQuestionIndex + 1}</Text>
       <Text style={styles.questionText}>{questions[currentQuestionIndex].body}</Text>
       {notification && (
@@ -57,16 +56,22 @@ const Test = ({ route, navigation }) => {
         />
       )}
       {questions[currentQuestionIndex].options.map((option, index) => (
-        <TouchableOpacity key={index} style={styles.optionButton}
+        <TouchableOpacity
+          key={index}
+          style={[
+            styles.optionButton,
+            questions[currentQuestionIndex].answer === option && styles.selectedOption
+          ]}
           onPress={() => handleOptionPress(option)}
         >
-          <Text style={styles.optionText}>{option.split('|').sort(() => Math.random() - 0.5)[0]}</Text>
+          <Text style={styles.optionText}>{option}</Text>
           <Text style={styles.arrowIcon}>{'>'}</Text>
         </TouchableOpacity>
       ))}
     </ScrollView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -105,6 +110,9 @@ const styles = StyleSheet.create({
   arrowIcon: {
     fontSize: 18,
     color: '#888',
+  },
+  selectedOption: {
+    backgroundColor: '#e0e0e0',
   },
 });
 
