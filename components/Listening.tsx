@@ -6,7 +6,7 @@ import { ListeningSession } from '@/services/ListeningSession';
 import Speakers from './Speakers';
 import HeaderBar from './HeaderBar';
 import StageTitle from './StageTitle';
-import { AudioPlayer, useAudioPlayer } from './AudioPlayer';
+import { AudioPlayer, AudioPlayerProvider, useAudioPlayer } from './AudioPlayer';
 import BottomBar from './BottomBar';
 
 const Listening = () => {
@@ -38,13 +38,15 @@ const Listening = () => {
       />
 
       { console.log('================', currentStage.audioUrl) }
-      <AudioPlayer
-        audioUrl={currentStage.audioUrl}
-        showControls={false}
-        containerStyle={styles.audioPlayerContainer}
-        sliderStyle={styles.audioPlayerSlider}
-        textStyle={styles.audioPlayerText}
-      />
+      <AudioPlayerProvider audioUrl={audioUrl}>
+        <AudioPlayer
+          audioUrl={currentStage.audioUrl}
+          showControls={false}
+          containerStyle={styles.audioPlayerContainer}
+          sliderStyle={styles.audioPlayerSlider}
+          textStyle={styles.audioPlayerText}
+        />
+      </AudioPlayerProvider>
 
       <View style={styles.controlsContainer}>
         <TouchableOpacity style={styles.playButton} onPress={togglePlayPause}>
