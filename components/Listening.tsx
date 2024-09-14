@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-na
 import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { ListeningSession } from '@/services/ListeningSession';
-import { Audio } from 'expo-av';
 import Speakers from './Speakers';
 import HeaderBar from './HeaderBar';
 import StageTitle from './StageTitle';
@@ -13,16 +12,20 @@ import BottomBar from './BottomBar';
 const Listening = () => {
   const [session, setSession] = useState(new ListeningSession());
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
-  const { togglePlayPause, playbackState } = useAudioPlayer()
+  const { stopAudio, togglePlayPause, playbackState, playTimes, playSpeed } = useAudioPlayer(session.getCurrentStage().audioUrl);
 
   const currentStage = session.getCurrentStage();
 
   const handleSpeedChange = async (speed: number) => {
     setPlaybackSpeed(speed);
-    if (sound) {
-      await sound.setRateAsync(speed, true);
-    }
   };
+
+  useEffect(() => {
+    return () => {
+      console.log('Unmounted', '========');
+      stopAudio();
+    };
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -34,6 +37,7 @@ const Listening = () => {
         speakers={currentStage.speakers}
       />
 
+      { console.log('================', currentStage.audioUrl) }
       <AudioPlayer
         audioUrl={currentStage.audioUrl}
         showControls={false}
@@ -47,7 +51,7 @@ const Listening = () => {
           <Icon name={playbackState.state == 'playing' ? "pause" : "play"} size={50} color="#fff" />
         </TouchableOpacity>
         <View style={styles.playsCounter}>
-          <Text style={styles.playsText}>Plays {session.getPlays()}</Text>
+          <Text style={styles.playsText}>Plays {playTimes}</Text>
         </View>
       </View>
 

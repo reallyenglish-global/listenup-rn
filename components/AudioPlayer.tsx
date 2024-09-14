@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Slider from '@react-native-community/slider';
-import TrackPlayer, { State, useProgress, usePlaybackState } from 'react-native-track-player';
+import TrackPlayer, { State, useProgress, usePlaybackState, useTrackPlayerEvents, Event } from 'react-native-track-player';
 import PlayButton from './PlayButton';
 
 interface AudioPlayerProps {
@@ -17,10 +17,16 @@ interface AudioPlayerProps {
 const useAudioPlayer = (audioUrl: string) => {
   const [isReady, setIsReady] = useState(false);
   const [playSpeed, setPlaySpeed] = useState(1);
+  const [playTimes, setPlayTimes] = useState(0);
   const progress = useProgress();
   const playbackState = usePlaybackState();
 
   useEffect(() => {
+    if (!audioUrl) {
+      console.log('audioUrl not set', '========');
+      return;
+    }
+      console.log('Setting up player', '========', 'useEffect', audioUrl);
     setupPlayer();
   }, []);
 
@@ -35,6 +41,7 @@ const useAudioPlayer = (audioUrl: string) => {
 
   const setupPlayer = async () => {
     try {
+        console.log(isReady, 'Setting up player', '========', audioUrl);
       await TrackPlayer.setupPlayer();
       await TrackPlayer.add({
         url: audioUrl,
@@ -45,6 +52,10 @@ const useAudioPlayer = (audioUrl: string) => {
     } catch (error) {
       console.error('Error setting up player:', error);
     }
+  };
+
+  const stopAudio = async () => {
+    await TrackPlayer.stop();
   };
 
   const togglePlayPause = useCallback(async () => {
@@ -58,18 +69,32 @@ const useAudioPlayer = (audioUrl: string) => {
   }, [playbackState.state]);
 
   const seekAudio = async (value: number) => {
+      console.log('Seeking audio to ' + value, '========');
     await TrackPlayer.seekTo(value * progress.duration);
   };
 
   const setSpeed = (speed: number) => {
+      console.log('setSpeed', '========', speed);
     setPlaySpeed(speed);
   };
+
+  const handlePlaybackCompletion = useCallback(() => {
+    setPlayTimes((prevTimes) => prevTimes + 1);
+  }, []);
+
+  useTrackPlayerEvents([Event.PlaybackState], async (event) => {
+    if (event.type === Event.PlaybackState && event.state === State.Ended) {
+      handlePlaybackCompletion();
+    }
+  });
 
   return {
     isReady,
     progress,
     playbackState,
     playSpeed,
+    playTimes,
+    stopAudio,
     togglePlayPause,
     seekAudio,
     setSpeed
@@ -121,7 +146,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
         minimumValue={0}
         maximumValue={1}
         value={progress.position / progress.duration}
-        onSlidingComplete={seekAudio}
       />
       <Text style={[styles.timeText, textStyle]}>
         {formatTime(progress.duration)}

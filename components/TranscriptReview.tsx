@@ -12,6 +12,7 @@ const TranscriptReview = ({ navigation, route }) => {
     <View style={styles.container}>
       <HeaderBar title={"Stage " + stage.number + ' - Transcript'} />
       <View style={styles.container}>
+      { console.log('================', stage) }
         <AudioPlayer
           audioUrl={stage.audioUrl}
           containerStyle={styles.audioPlayerContainer}
