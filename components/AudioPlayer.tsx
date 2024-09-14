@@ -1,14 +1,20 @@
-import React, { useState, useEffect, useCallback, createContext, useContext } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Slider from '@react-native-community/slider';
 import TrackPlayer, { State, useProgress, usePlaybackState, useTrackPlayerEvents, Event } from 'react-native-track-player';
 import PlayButton from './PlayButton';
 
-// Create a context for the audio player
-const AudioPlayerContext = createContext<ReturnType<typeof useAudioPlayerState> | null>(null);
+interface AudioPlayerProps {
+  audioUrl: string;
+  showControls?: boolean;
+  onProgressChange?: (progress: number) => void;
+  containerStyle?: object;
+  sliderStyle?: object;
+  textStyle?: object;
+}
 
-// Hook to manage audio player state
-const useAudioPlayerState = () => {
+// Custom hook to manage audio player state and functions
+const useAudioPlayer = (audioUrl: string) => {
   const [isReady, setIsReady] = useState(false);
   const [playSpeed, setPlaySpeed] = useState(1);
   const [playTimes, setPlayTimes] = useState(0);
@@ -16,6 +22,16 @@ const useAudioPlayerState = () => {
   const playbackState = usePlaybackState();
 
   useEffect(() => {
+    if (!audioUrl) {
+      return;
+    }
+    setupPlayer();
+  }, []);
+
+  useEffect(() => {
+    if (!audioUrl) {
+      return;
+    }
     const adjustPlaybackRate = async () => {
       if (isReady) {
         await TrackPlayer.setRate(playSpeed);
@@ -24,27 +40,54 @@ const useAudioPlayerState = () => {
     adjustPlaybackRate();
   }, [playSpeed, isReady]);
 
+  const isPlayerSetup = async () => {
+    try {
+      const state = await TrackPlayer.getState();
+      return state !== 'none';
+    } catch (error) {
+      console.error('Error checking player state:', error);
+      return false;
+    }
+  }
+
+  const setupPlayer = async () => {
+    try {
+      const isSetup = await isPlayerSetup();
+      if (!isSetup) {
+        await TrackPlayer.setupPlayer();
+      }
+      // clear the queue list
+      await TrackPlayer.reset();
+      await TrackPlayer.add({
+        url: audioUrl,
+        title: 'Audio Track',
+        artist: 'Unknown',
+      });
+      setIsReady(true);
+    } catch (error) {
+      console.error('Error setting up player:', error);
+    }
+  };
+
   const stopAudio = async () => {
-    await TrackPlayer.stop();
+    // when playwhenready is true stop won't stop properly
+    await TrackPlayer.pause();
   };
 
   const togglePlayPause = useCallback(async () => {
+    console.log('togglePlayPause', playbackState.state);
     if (playbackState.state === State.Playing) {
-      console.log('Pausing audio');
       await TrackPlayer.pause();
-    } else {
-      console.log('Playing audio');
+    } else if (playbackState.state === State.Ready) {
       await TrackPlayer.play();
     }
   }, [playbackState.state]);
 
   const seekAudio = async (value: number) => {
-    console.log('Seeking audio to ' + value, '========');
     await TrackPlayer.seekTo(value * progress.duration);
   };
 
   const setSpeed = (speed: number) => {
-    console.log('setSpeed', '========', speed);
     setPlaySpeed(speed);
   };
 
@@ -60,7 +103,6 @@ const useAudioPlayerState = () => {
 
   return {
     isReady,
-    setIsReady,
     progress,
     playbackState,
     playSpeed,
@@ -72,62 +114,8 @@ const useAudioPlayerState = () => {
   };
 };
 
-// Provider component that sets up the player
-const AudioPlayerProvider: React.FC<{ audioUrl: string; children: React.ReactNode }> = ({ audioUrl, children }) => {
-  const audioPlayerState = useAudioPlayerState();
-
-  useEffect(() => {
-    const setupPlayer = async () => {
-      if (!audioUrl) {
-        console.log('audioUrl not set', '========');
-        return;
-      }
-      try {
-        console.log('Setting up player', '========', audioUrl);
-        await TrackPlayer.setupPlayer();
-        await TrackPlayer.add({
-          url: audioUrl,
-          title: 'Audio Track',
-          artist: 'Unknown',
-        });
-        audioPlayerState.setIsReady(true);
-      } catch (error) {
-        console.error('Error setting up player:', error);
-      }
-    };
-
-    setupPlayer();
-
-    return () => {
-      TrackPlayer.destroy();
-    };
-  }, [audioUrl]);
-
-  return (
-    <AudioPlayerContext.Provider value={audioPlayerState}>
-      {children}
-    </AudioPlayerContext.Provider>
-  );
-};
-
-// Hook to use the audio player context
-const useAudioPlayer = () => {
-  const context = useContext(AudioPlayerContext);
-  if (!context) {
-    throw new Error('useAudioPlayer must be used within an AudioPlayerProvider');
-  }
-  return context;
-};
-
-interface AudioPlayerProps {
-  showControls?: boolean;
-  onProgressChange?: (progress: number) => void;
-  containerStyle?: object;
-  sliderStyle?: object;
-  textStyle?: object;
-}
-
 const AudioPlayer: React.FC<AudioPlayerProps> = ({
+  audioUrl,
   showControls = true,
   onProgressChange,
   containerStyle,
@@ -140,7 +128,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     playbackState,
     togglePlayPause,
     seekAudio
-  } = useAudioPlayer();
+  } = useAudioPlayer(audioUrl);
 
   useEffect(() => {
     if (onProgressChange) {
@@ -171,7 +159,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
         minimumValue={0}
         maximumValue={1}
         value={progress.position / progress.duration}
-        onSlidingComplete={seekAudio}
       />
       <Text style={[styles.timeText, textStyle]}>
         {formatTime(progress.duration)}
@@ -202,4 +189,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export { AudioPlayerProvider, AudioPlayer, useAudioPlayer };
+export { AudioPlayer, useAudioPlayer };

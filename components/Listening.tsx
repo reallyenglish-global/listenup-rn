@@ -6,13 +6,13 @@ import { ListeningSession } from '@/services/ListeningSession';
 import Speakers from './Speakers';
 import HeaderBar from './HeaderBar';
 import StageTitle from './StageTitle';
-import { AudioPlayer, AudioPlayerProvider, useAudioPlayer } from './AudioPlayer';
+import { AudioPlayer, useAudioPlayer } from './AudioPlayer';
 import BottomBar from './BottomBar';
 
 const Listening = () => {
   const [session, setSession] = useState(new ListeningSession());
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
-  const { stopAudio, togglePlayPause, playbackState, playTimes, playSpeed } = useAudioPlayer(session.getCurrentStage().audioUrl);
+  const { stopAudio, togglePlayPause, playbackState, playTimes, playSpeed } = useAudioPlayer();
 
   const currentStage = session.getCurrentStage();
 
@@ -37,16 +37,13 @@ const Listening = () => {
         speakers={currentStage.speakers}
       />
 
-      { console.log('================', currentStage.audioUrl) }
-      <AudioPlayerProvider audioUrl={audioUrl}>
-        <AudioPlayer
-          audioUrl={currentStage.audioUrl}
-          showControls={false}
-          containerStyle={styles.audioPlayerContainer}
-          sliderStyle={styles.audioPlayerSlider}
-          textStyle={styles.audioPlayerText}
-        />
-      </AudioPlayerProvider>
+      <AudioPlayer
+        audioUrl={currentStage.audioUrl}
+        showControls={false}
+        containerStyle={styles.audioPlayerContainer}
+        sliderStyle={styles.audioPlayerSlider}
+        textStyle={styles.audioPlayerText}
+      />
 
       <View style={styles.controlsContainer}>
         <TouchableOpacity style={styles.playButton} onPress={togglePlayPause}>
