@@ -5,27 +5,32 @@ export class Challenge {
     this.questions = stage.questions;
     this.responses = stage.responses;
     this.currentQuestionIndex = 0;
-    this.shuffleQuestions();
+    //this.shuffleQuestions();
   }
 
   shuffleQuestions(): void {
+    console.log('before shuffle', this.questions);
     this.questions.map(question => {
       question['correct'] = false;
       question['answer'] = '';
       question['correctAnswer'] = question.options[0];
+      console.log('question', question);
       question['options'] = question.options.sort(() => Math.random() - 0.5)
         .map(option => option.split('|').sort(() => Math.random() - 0.5)[0])
     });
-    this.questions = this.questions.sort(() => Math.random() - 0.5);
+    console.log('after shuffle', this.questions);
+    //this.questions = this.questions.sort(() => Math.random() - 0.5);
   }
 
   answer(id, answer): boolean {
+    console.log('answer', id, answer);
     let question = this.questions[id];
     question['answer'] = answer;
-    question['correct'] = answer == question.answer;
+    question['correct'] = question.correctAnswer.indexOf(answer) > -1;
   }
 
   passed(): boolean {
+      console.log(this.questions, this.questions.filter(question => question['correct']));
     this.questions.length == this.questions.filter(question => question['correct']).length;
   }
 

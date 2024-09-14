@@ -33,7 +33,15 @@ export class StageManager {
       })),
       // replace line breaks with <br />
       transcript: stage.transcript.replace(/\r/g, '\n'),
-      questions: stage.mcqs,
+      questions: stage.mcqs.map((question: any) => (
+        {
+          answer: '',
+          correct: false,
+          correctAnswer: question.options[0],
+          body: question.question,
+          options: question.options.map((option: string) => option.split('|').sort(() => Math.random() - 0.5)[0]).sort(() => Math.random() - 0.5)
+        }
+      )),
       audioUrl: `../assets/audios/s1/S${index + 1}.mp3`,
       failedTimes: 0,
       duration: stage.duration
