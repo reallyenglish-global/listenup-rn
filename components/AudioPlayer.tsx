@@ -78,7 +78,9 @@ const useAudioPlayer = (audioUrl: string) => {
     console.log('togglePlayPause', playbackState.state);
     if (playbackState.state === State.Playing) {
       await TrackPlayer.pause();
-    } else if (playbackState.state === State.Ready || playbackState.state === State.Paused) {
+    } else if (playbackState.state === State.Ready || 
+      playbackState.state === State.Paused || 
+      playbackState.state === State.Ended) {
       await TrackPlayer.play();
     }
   }, [playbackState.state]);
