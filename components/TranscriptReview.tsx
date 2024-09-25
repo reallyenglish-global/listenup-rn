@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, useWindowDimensions } from 'react-native';
 import HeaderBar from './HeaderBar';
 import { useSession } from '@/hooks/useSession';
 import { AudioPlayer } from './AudioPlayer';
 import BottomBar from './BottomBar';
 const TranscriptReview = ({ navigation, route }) => {
+  const { width, height } = useWindowDimensions();
   const { session } = useSession();
   if (!session) {
     return <Text>Loading...</Text>;
@@ -12,7 +13,7 @@ const TranscriptReview = ({ navigation, route }) => {
   const stage = session.getCurrentStage();
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { width, height }]}>
       <HeaderBar title={"Stage " + stage.number + ' - Transcript'} />
       <View style={styles.container}>
         <AudioPlayer
@@ -41,7 +42,7 @@ const styles = StyleSheet.create({
   transcriptContainer: {
     flex: 1,
     padding: 20,
-    maxHeight: 600
+    height: '60%',
   },
   transcriptText: {
     fontSize: 16,
