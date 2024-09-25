@@ -4,6 +4,7 @@ import { StageManager, Stage } from './StageManager';
 export class ListeningSession {
   private currentStage: Stage;
   private currentStageNumber: Number;
+  private currentStageRetries: Number = 0;
   private stageManager: StageManager;
 
   constructor() {
@@ -27,15 +28,23 @@ export class ListeningSession {
   }
 
   async moveToNextStage(): Promise<void> {
-    const nextStageNumber = this.currentStage.number + 1;
-    console.log('======', 'moveToNextStage', nextStageNumber);
-    this.currentStage = this.stageManager.getStage(nextStageNumber);
+    const stage = this.stageManager.getStage(this.currentStageNumber + 1);
+    if (!stage) {
+      return;
+    }
+    this.currentStage = stage;
+    await this.saveProgress();
+  }
+  async retryCurrentStage(): Promise<void> {
+    this.currentStage.failedTimes += 1;
     await this.saveProgress();
   }
 
+
   async saveProgress(): Promise<void> {
     try {
-      await AsyncStorage.setItem('@current_stage', JSON.stringify(this.currentStage.number));
+      await AsyncStorage.setItem('@current_stage', JSON.stringify(this.currentStageNumber));
+      await AsyncStorage.setItem('@current_stage_retries', this.currentStageRetries);
     } catch (error) {
       console.error('Error saving progress:', error);
     }
@@ -54,6 +63,11 @@ export class ListeningSession {
         this.currentStageNumber = 1;
       }
       this.currentStage = this.stageManager.getStage(this.currentStageNumber);
+
+      const savedRetries = await AsyncStorage.getItem('@current_stage_retries');
+      if (savedRetries !== null) {
+        this.currentStage.failedTimes = savedRetries;
+      }
     } catch (error) {
       console.error('Error loading progress:', error);
     }
