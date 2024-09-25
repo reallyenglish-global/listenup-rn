@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, useWindowDimensions } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, useWindowDimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Speakers from './Speakers';
 import FailedTimes from './FailedTimes';
@@ -13,7 +13,12 @@ const Introduction = ({ navigation }) => {
   const { session } = useSession();
 
   if (!session) {
-    return <Text>Loading...</Text>;
+    return (
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Loading ...</Text>
+      </View>
+    );
   }
 
   const stage = session.getCurrentStage();
@@ -62,6 +67,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F0F0F0',
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   scrollContent: {
     flexGrow: 1,
