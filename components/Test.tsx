@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { ListeningSession } from '@/services/ListeningSession';
 import { Challenge } from '@/services/Challenge';
 import HeaderBar from './HeaderBar';
 import PopupNotification from './PopupNotification';
+import { useSession } from '@/hooks/useSession';
 
 const Test = ({ navigation }) => {
-  const [listeningSession] = useState(() => new ListeningSession());
+  const { session } = useSession();
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [questions, setQuestions] = useState<any[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [notification, setNotification] = useState(null);
+  const stage = session?.getCurrentStage();
 
   useEffect(() => {
     const initializeSession = async () => {
-      await listeningSession.loadProgress();
-      const newChallenge = new Challenge(listeningSession.getCurrentStage());
+      const newChallenge = new Challenge(stage);
       setChallenge(newChallenge);
       setQuestions(newChallenge.getQuestions());
       setCurrentQuestionIndex(0);
@@ -32,8 +32,8 @@ const Test = ({ navigation }) => {
       const passed = challenge.passed();
       if (passed) {
         showNotification(challenge.response(), 'success');
-        await listeningSession.moveToNextStage();
-        const newChallenge = new Challenge(listeningSession.getCurrentStage());
+        await session.moveToNextStage();
+        const newChallenge = new Challenge(stage);
         setChallenge(newChallenge);
         setQuestions(newChallenge.getQuestions());
         setCurrentQuestionIndex(0);
@@ -66,7 +66,7 @@ const Test = ({ navigation }) => {
 
   return (
     <ScrollView style={styles.container}>
-      <HeaderBar title={`Stage ${listeningSession.getCurrentStage().number} - Challenge`} />
+      <HeaderBar title={`Stage ${stage.number} - Challenge`} />
       <Text style={styles.questionNumber}>Q{currentQuestionIndex + 1}</Text>
       <Text style={styles.questionText}>{questions[currentQuestionIndex].body}</Text>
       {notification && (

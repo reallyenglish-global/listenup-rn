@@ -7,10 +7,11 @@ import Speakers from './Speakers';
 import HeaderBar from './HeaderBar';
 import StageTitle from './StageTitle';
 import { AudioPlayer, useAudioPlayer } from './AudioPlayer';
+import { useSession } from '@/hooks/useSession';
 import BottomBar from './BottomBar';
 
 const Listening = () => {
-  const [session, setSession] = useState(new ListeningSession());
+  const { session } = useSession();
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
   const { stopAudio, togglePlayPause, playbackState, playTimes, playSpeed } = useAudioPlayer();
 
@@ -21,6 +22,9 @@ const Listening = () => {
   };
 
   useEffect(() => {
+    const initializeSession = async () => {
+      await session.loadProgress();
+    };
     return () => {
       console.log('Unmounted', '========');
       stopAudio();

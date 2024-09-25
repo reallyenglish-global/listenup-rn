@@ -5,11 +5,13 @@ import Introduction from '@/components/Introduction';
 import Listening from '@/components/Listening';
 import Test from '@/components/Test';
 import TranscriptReview from '@/components/TranscriptReview';
+import { SessionProvider } from '@/hooks/useSession';
 
 const Stack = createStackNavigator();
 
 const App = () => {
   return (
+    <SessionProvider>
     <NavigationContainer independent={true}>
       <Stack.Navigator initialRouteName="Introduction" headerMode="none">
         <Stack.Screen name="Introduction" component={Introduction} />
@@ -18,6 +20,7 @@ const App = () => {
         <Stack.Screen name="TranscriptReview" component={TranscriptReview} />
       </Stack.Navigator>
     </NavigationContainer>
+    </SessionProvider>
   );
 };
 

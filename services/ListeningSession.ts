@@ -3,11 +3,11 @@ import { StageManager, Stage } from './StageManager';
 
 export class ListeningSession {
   private currentStage: Stage;
+  private currentStageNumber: Number;
   private stageManager: StageManager;
 
   constructor() {
     this.stageManager = new StageManager();
-    this.currentStage = this.stageManager.getStage(1);
   }
 
   getCurrentStage(): Stage {
@@ -28,6 +28,7 @@ export class ListeningSession {
 
   async moveToNextStage(): Promise<void> {
     const nextStageNumber = this.currentStage.number + 1;
+    console.log('======', 'moveToNextStage', nextStageNumber);
     this.currentStage = this.stageManager.getStage(nextStageNumber);
     await this.saveProgress();
   }
@@ -41,13 +42,18 @@ export class ListeningSession {
   }
 
   async loadProgress(): Promise<void> {
+    if (this.currentStage) {
+      return;
+    }
     try {
       const savedStage = await AsyncStorage.getItem('@current_stage');
       console.log('loaded stage', savedStage);
       if (savedStage !== null) {
-        const stageNumber = JSON.parse(savedStage);
-        this.currentStage = this.stageManager.getStage(stageNumber);
+        this.currentStageNumber = JSON.parse(savedStage);
+      } else {
+        this.currentStageNumber = 1;
       }
+      this.currentStage = this.stageManager.getStage(this.currentStageNumber);
     } catch (error) {
       console.error('Error loading progress:', error);
     }

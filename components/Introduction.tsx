@@ -3,28 +3,22 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, useWindowD
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Speakers from './Speakers';
 import FailedTimes from './FailedTimes';
-import { ListeningSession } from '@/services/ListeningSession';
+import { useSession } from '@/hooks/useSession';
 import HeaderBar from './HeaderBar';
 import StageTitle from './StageTitle';
 import BottomBar from './BottomBar';
 
 const Introduction = ({ navigation }) => {
   const { width, height } = useWindowDimensions();
+  const { session } = useSession();
 
-  const [session, setSession] = useState(new ListeningSession());
+  if (!session) {
+    return <Text>Loading...</Text>;
+  }
+
   const stage = session.getCurrentStage();
-  const currentStage = session.getCurrentStage();
 
   const SPEAKER_IMAGE_HEIGHT = 150; // Adjust this value to match your speaker image height
-
-  useEffect(() => {
-    const initializeSession = async () => {
-      await session.loadProgress();
-    };
-
-    initializeSession();
-  }, []);
-
 
   return (
     <View style={[styles.container, { width, height }]}>
