@@ -72,8 +72,7 @@ const styles = StyleSheet.create({
   },
   speakersContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    justifyContent: 'center',
   },
   speakersLabel: {
     fontSize: 16,
@@ -111,22 +110,6 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     fontSize: 18,
     lineHeight: 24,
-  },
-  startButton: {
-    flexDirection: 'row',
-    backgroundColor: '#3498db',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginHorizontal: 20,
-    marginBottom: 20,
-  },
-  startButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    marginRight: 10,
   },
 });
 
