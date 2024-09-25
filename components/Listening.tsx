@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, useWindowDimensions } from 'react-native';
 import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { ListeningSession } from '@/services/ListeningSession';
@@ -12,6 +12,7 @@ import BottomBar from './BottomBar';
 
 const Listening = () => {
   const { session } = useSession();
+  const { width, height } = useWindowDimensions();
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
   const { stopAudio, togglePlayPause, playbackState, playTimes, playSpeed } = useAudioPlayer();
 
@@ -22,9 +23,6 @@ const Listening = () => {
   };
 
   useEffect(() => {
-    const initializeSession = async () => {
-      await session.loadProgress();
-    };
     return () => {
       console.log('Unmounted', '========');
       stopAudio();
@@ -32,48 +30,50 @@ const Listening = () => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { width, height }]}>
       <HeaderBar title={"Stage " + session.getCurrentStageNumber()} />
 
-      <StageTitle title={currentStage.title} />
+      <View style={[styles.container, { width, height }]}>
+        <StageTitle title={currentStage.title} />
 
-      <Speakers
-        speakers={currentStage.speakers}
-      />
+        <Speakers
+          speakers={currentStage.speakers}
+        />
 
-      <AudioPlayer
-        audioUrl={currentStage.audioUrl}
-        showControls={false}
-        containerStyle={styles.audioPlayerContainer}
-        sliderStyle={styles.audioPlayerSlider}
-        textStyle={styles.audioPlayerText}
-      />
+        <AudioPlayer
+          audioUrl={currentStage.audioUrl}
+          showControls={false}
+          containerStyle={styles.audioPlayerContainer}
+          sliderStyle={styles.audioPlayerSlider}
+          textStyle={styles.audioPlayerText}
+        />
 
-      <View style={styles.controlsContainer}>
-        <TouchableOpacity style={styles.playButton} onPress={togglePlayPause}>
-          <Icon name={playbackState.state == 'playing' ? "pause" : "play"} size={50} color="#fff" />
-        </TouchableOpacity>
-        <View style={styles.playsCounter}>
-          <Text style={styles.playsText}>Plays {playTimes}</Text>
+        <View style={styles.controlsContainer}>
+          <TouchableOpacity style={styles.playButton} onPress={togglePlayPause}>
+            <Icon name={playbackState.state == 'playing' ? "pause" : "play"} size={50} color="#fff" />
+          </TouchableOpacity>
+          <View style={styles.playsCounter}>
+            <Text style={styles.playsText}>Plays {playTimes}</Text>
+          </View>
+        </View>
+
+        <View style={styles.speedControlContainer}>
+          <Text style={styles.speedText}>Speed: {playbackSpeed.toFixed(1)}x</Text>
+          <Slider
+            style={styles.speedSlider}
+            minimumValue={0.5}
+            maximumValue={2.0}
+            step={0.1}
+            value={playbackSpeed}
+            onValueChange={handleSpeedChange}
+            minimumTrackTintColor="#3498db"
+            maximumTrackTintColor="#d3d3d3"
+            thumbTintColor="#3498db"
+          />
         </View>
       </View>
-
-      <View style={styles.speedControlContainer}>
-        <Text style={styles.speedText}>Speed: {playbackSpeed.toFixed(1)}x</Text>
-        <Slider
-          style={styles.speedSlider}
-          minimumValue={0.5}
-          maximumValue={2.0}
-          step={0.1}
-          value={playbackSpeed}
-          onValueChange={handleSpeedChange}
-          minimumTrackTintColor="#3498db"
-          maximumTrackTintColor="#d3d3d3"
-          thumbTintColor="#3498db"
-        />
-      </View>
       <BottomBar title="Challenge" target="Test" />
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   },
   speedControlContainer: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   speedText: {
     fontSize: 16,
