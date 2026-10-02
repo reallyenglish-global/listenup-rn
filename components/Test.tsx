@@ -15,6 +15,7 @@ const Test = ({ navigation }) => {
 
   useEffect(() => {
     const initializeSession = async () => {
+      if (!stage) return;
       const newChallenge = new Challenge(stage);
       setChallenge(newChallenge);
       setQuestions(newChallenge.getQuestions());
@@ -22,10 +23,10 @@ const Test = ({ navigation }) => {
     };
 
     initializeSession();
-  }, []);
+  }, [stage]);
 
   const handleOptionPress = async (option: string) => {
-    if (!challenge) return;
+    if (!challenge || !session || !stage) return;
 
     challenge.answer(currentQuestionIndex, option);
     if (currentQuestionIndex === questions.length - 1) {
@@ -33,7 +34,8 @@ const Test = ({ navigation }) => {
       if (passed) {
         showNotification(challenge.response(), 'success');
         await session.moveToNextStage();
-        const newChallenge = new Challenge(stage);
+        const nextStage = session.getCurrentStage();
+        const newChallenge = new Challenge(nextStage);
         setChallenge(newChallenge);
         setQuestions(newChallenge.getQuestions());
         setCurrentQuestionIndex(0);

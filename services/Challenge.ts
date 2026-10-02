@@ -1,7 +1,7 @@
-import { Stage } from './StageManager';
+import { Question, Stage } from './StageManager';
 
 export class Challenge {
-  private questions: any[];
+  private questions: Question[];
   private responses: string[];
   private currentQuestionIndex: number;
 
@@ -28,7 +28,7 @@ export class Challenge {
   answer(id: number, answer: string): void {
     let question = this.questions[id];
     question.answer = answer;
-    question.correct = question.correctAnswer.indexOf(answer) > -1;
+    question.correct = (question.correctAnswer ?? '').includes(answer);
   }
 
   passed(): boolean {
@@ -39,7 +39,7 @@ export class Challenge {
     return this.passed() ? this.responses[0] : this.responses[1];
   }
 
-  getQuestions(): any[] {
+  getQuestions(): Question[] {
     return this.questions;
   }
 

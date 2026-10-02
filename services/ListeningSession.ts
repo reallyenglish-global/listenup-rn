@@ -3,11 +3,12 @@ import { StageManager, Stage } from './StageManager';
 
 export class ListeningSession {
   private currentStage: Stage;
-  private currentStageNumber: Number;
   private stageManager: StageManager;
+  private progressLoaded = false;
 
   constructor() {
     this.stageManager = new StageManager();
+    this.currentStage = this.stageManager.getStage(1) as Stage;
   }
 
   getCurrentStage(): Stage {
@@ -27,9 +28,9 @@ export class ListeningSession {
   }
 
   async moveToNextStage(): Promise<void> {
-    const nextStageNumber = this.currentStage.number + 1;
-    console.log('======', 'moveToNextStage', nextStageNumber);
-    this.currentStage = this.stageManager.getStage(nextStageNumber);
+    if (this.isComplete()) return;
+    const nextStage = this.stageManager.getStage(this.currentStage.number + 1);
+    if (nextStage) this.currentStage = nextStage;
     await this.saveProgress();
   }
 
@@ -42,20 +43,23 @@ export class ListeningSession {
   }
 
   async loadProgress(): Promise<void> {
-    if (this.currentStage) {
+    if (this.progressLoaded) {
       return;
     }
     try {
       const savedStage = await AsyncStorage.getItem('@current_stage');
-      console.log('loaded stage', savedStage);
-      if (savedStage !== null) {
-        this.currentStageNumber = JSON.parse(savedStage);
-      } else {
-        this.currentStageNumber = 1;
-      }
-      this.currentStage = this.stageManager.getStage(this.currentStageNumber);
+      const parsed = savedStage === null ? 1 : JSON.parse(savedStage);
+      const stageNumber = typeof parsed === 'number' && Number.isInteger(parsed) ? parsed : 1;
+      this.currentStage = this.stageManager.getStage(stageNumber) ?? this.stageManager.getStage(1) as Stage;
+      this.progressLoaded = true;
     } catch (error) {
       console.error('Error loading progress:', error);
+      this.currentStage = this.stageManager.getStage(1) as Stage;
+      this.progressLoaded = true;
     }
+  }
+
+  isComplete(): boolean {
+    return this.currentStage.number === this.getTotalStages();
   }
 }

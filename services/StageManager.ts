@@ -2,14 +2,28 @@ import stagesData from '../assets/audios/s1/stages.json';
 
 export interface Speaker {
   name: string;
-  image: string;
+  imageUrl: string;
+}
+
+export interface Question {
+  body: string;
+  options: string[];
+  correct?: boolean;
+  answer?: string;
+  correctAnswer?: string;
 }
 
 export interface Stage {
   number: number;
-  question: string;
+  title: string;
+  responses: [string, string];
+  difficulty: string;
+  context: string;
   speakers: Speaker[];
-  audio: string;
+  transcript: string;
+  questions: Question[];
+  audioUrl: string;
+  failedTimes: number;
   duration: number;
 }
 
@@ -20,23 +34,23 @@ export class StageManager {
     this.stages = this.parseStages(stagesData);
   }
 
-  private parseStages(data: any): Stage[] {
-    return data.stages.map((stage: any, index: number) => ({
+  private parseStages(data: { stages: Array<Record<string, unknown>> }): Stage[] {
+    return data.stages.map((stage, index) => ({
       number: index + 1,
-      title: stage.title,
-      responses: [stage.successMessage, stage.failureMessage],
-      difficulty: stage.difficulty,
-      context: stage.situation,
-      speakers: stage.speakers.map((speaker: any) => ({
+      title: String(stage.title),
+      responses: [String(stage.successMessage), String(stage.failureMessage)],
+      difficulty: String(stage.difficulty),
+      context: String(stage.situation),
+      speakers: (stage.speakers as Array<{ name: string; image: string }>).map((speaker) => ({
         name: speaker.name,
         imageUrl: `../assets/images/speakers/${speaker.image}@2x.png`
       })),
       // replace line breaks with <br />
-      transcript: stage.transcript.replace(/\r/g, '\n'),
-      questions: stage.mcqs,
+      transcript: String(stage.transcript).replace(/\r/g, '\n'),
+      questions: stage.mcqs as Question[],
       audioUrl: `../assets/audios/s1/S${index + 1}.mp3`,
       failedTimes: 0,
-      duration: stage.duration
+      duration: Number(stage.duration)
     }));
   }
 
