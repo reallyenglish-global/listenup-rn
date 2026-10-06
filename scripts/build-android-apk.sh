@@ -16,7 +16,7 @@ command -v java >/dev/null
 [[ -d "$ANDROID_HOME/build-tools/34.0.0" ]]
 
 export NODE_ENV=production
-CI=1 pnpm exec expo prebuild --platform android --no-install --clean
+CI=1 pnpm exec expo prebuild --platform android --no-install
 (
   cd android
   ./gradlew --no-daemon "-Dorg.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=512m" assembleRelease
