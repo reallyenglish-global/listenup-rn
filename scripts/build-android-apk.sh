@@ -12,8 +12,8 @@ fi
 command -v node >/dev/null
 command -v pnpm >/dev/null
 command -v java >/dev/null
-[[ -d "$ANDROID_HOME/platforms/android-34" ]]
-[[ -d "$ANDROID_HOME/build-tools/34.0.0" ]]
+[[ -d "$ANDROID_HOME/platforms/android-36" ]]
+[[ -d "$ANDROID_HOME/build-tools/36.0.0" ]]
 
 export NODE_ENV=production
 CI=1 pnpm exec expo prebuild --platform android --no-install
@@ -24,5 +24,5 @@ CI=1 pnpm exec expo prebuild --platform android --no-install
 
 apk="android/app/build/outputs/apk/release/app-release.apk"
 [[ -s "$apk" ]]
-"$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose "$apk"
+"$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose "$apk"
 printf 'APK_PATH=%s/%s\n' "$PWD" "$apk"

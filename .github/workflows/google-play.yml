@@ -1,6 +1,12 @@
 name: Google Play internal draft
 
 on:
+  workflow_call:
+    inputs:
+      upload:
+        type: boolean
+        default: false
+        required: false
   push:
     tags: ['v*']
   workflow_dispatch:
@@ -21,7 +27,9 @@ concurrency:
 
 jobs:
   build:
-    if: github.event_name == 'push' || github.ref == 'refs/heads/main'
+    if: >-
+      github.event_name == 'push' || github.ref == 'refs/heads/main' ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/ci/google-play-internal-drafts' && !inputs.upload)
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     environment: google-play
@@ -36,8 +44,15 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: Require release commit on main
-        run: git merge-base --is-ancestor HEAD origin/main
+      - name: Require main ancestry or exact build-only validation branch
+        env:
+          UPLOAD_INPUT: ${{ inputs.upload }}
+        run: |
+          if [[ "$GITHUB_EVENT_NAME" == workflow_dispatch && "$GITHUB_REF" == refs/heads/ci/google-play-internal-drafts && "$UPLOAD_INPUT" != true ]]; then
+            printf 'Signing validation on approved PR branch; Play upload is forbidden.\n'
+          else
+            git merge-base --is-ancestor HEAD origin/main
+          fi
       - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4; uses packageManager pin
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
@@ -69,7 +84,7 @@ jobs:
           java-version: '17'
       - uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4
         with:
-          packages: 'platforms;android-34 build-tools;34.0.0 ndk;26.1.10909125'
+          packages: 'platforms;android-36 build-tools;36.0.0 ndk;27.1.12297006'
           accept-android-sdk-licenses: 'true'
           log-accepted-android-sdk-licenses: 'false'
       - run: pnpm install --frozen-lockfile
