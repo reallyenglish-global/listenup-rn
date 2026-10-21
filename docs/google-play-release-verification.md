@@ -6,7 +6,7 @@ Scope: reviewed workflow and policy implementation only. The existing preview AP
 
 - Frozen pnpm dependency installation succeeded using Node 24.20.0.
 - `node --test scripts/tests/play-release.test.mjs`: 8 tests passed.
-- `python3 -m unittest discover -s scripts/tests -p 'test_*.py'`: 8 tests passed. Fixtures are synthetic manifest/track/bundle policy inputs, not real Play responses.
+- `python3 -m unittest discover -s scripts/tests -p 'test_*.py'`: 8 tests passed. Fixtures are synthetic manifest/track/bundle policy inputs, not real Play responses. Both release-policy suites are also wired into the ordinary pull-request/main test workflow without secrets.
 - `pnpm exec jest --ci --runInBand`: existing app suite passed (1 test, 1 snapshot).
 - actionlint 1.7.12: new workflow passed. Tool binary checksum checked against its GitHub release digest.
 - ShellCheck and Bash syntax check passed for the signing build wrapper.

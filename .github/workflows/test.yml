@@ -18,5 +18,9 @@ jobs:
         with:
           node-version: 24.20.0
           cache: pnpm
+      - name: Check release policy (no signing or Play credentials)
+        run: |
+          node --test scripts/tests/play-release.test.mjs
+          python3 -m unittest discover -s scripts/tests -p 'test_*.py'
       - run: pnpm install --frozen-lockfile
       - run: pnpm test
