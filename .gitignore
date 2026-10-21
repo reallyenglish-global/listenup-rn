@@ -3,6 +3,9 @@ node_modules/
 dist/
 npm-debug.*
 *.jks
+*.keystore
+play-artifact/
+__pycache__/
 *.p8
 *.p12
 *.key

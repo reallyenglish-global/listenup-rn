@@ -1,0 +1,22 @@
+// Applied only to generated native release builds; never edits Expo's debug key.
+// finalizeDsl runs after build.gradle defaults but before AGP freezes signing.
+gradle.beforeProject { project ->
+    project.plugins.withId('com.android.application') {
+        project.extensions.getByName('androidComponents').finalizeDsl { android ->
+            def required = { name ->
+                def value = System.getenv(name)
+                if (!value) throw new GradleException('Missing release signing variable: ' + name)
+                value
+            }
+            def signing = android.signingConfigs.create('playUpload') {
+                storeFile = new File(required('PLAY_KEYSTORE_PATH'))
+                storePassword = required('PLAY_STORE_PASSWORD')
+                keyAlias = required('PLAY_KEY_ALIAS')
+                keyPassword = required('PLAY_KEY_PASSWORD')
+            }
+            def release = android.buildTypes.getByName('release')
+            if (release.debuggable) throw new GradleException('Refusing debuggable Play build')
+            release.signingConfig = signing
+        }
+    }
+}
