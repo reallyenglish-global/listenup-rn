@@ -7,6 +7,10 @@ on:
     branches: [main]
   workflow_dispatch:
     inputs:
+      version_code:
+        description: 'Required for signed_bundle: unused Android versionCode checked against Play Console'
+        type: string
+        required: false
       signed_bundle:
         description: 'Also build a signed AAB (approved release branch only; never upload)'
         type: boolean
@@ -21,6 +25,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && inputs.signed_bundle
     uses: ./.github/workflows/google-play.yml
     with:
+      version_code: ${{ inputs.version_code }}
       upload: false
     secrets: inherit
 
