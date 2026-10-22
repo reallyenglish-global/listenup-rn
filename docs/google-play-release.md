@@ -27,7 +27,7 @@ Secret existence is checked without printing values. The keystore is decoded wit
 
 Environment variables:
 
-- `PLAY_VERSION_CODE_BASE`: optional positive integer; defaults to `1000000`. Version code is `base + github.run_number * 100 + github.run_attempt` (attempt <=99), capped at 2,100,000,000. Before first automated release, choose a base making the result larger than **every version code already uploaded**. Keep the workflow identity and base stable. Older-run reruns can have a lower code than a newer run: Play should reject them; start a new run instead. Re-running after a successfully committed upload uses a fresh version code and creates or replaces the internal draft; inspect Play Console first after an ambiguous network failure.
+- `PLAY_VERSION_CODE`: required for tag-triggered releases; a positive decimal integer capped at 2,100,000,000. Manual and reusable calls instead require the explicit string input `version_code`. There is no generated fallback: GitHub run numbers are workflow-local and can reset after workflow changes (the first main build produced `1000101`, below the previous workflow's `1000901`). Select an unused code **greater than every code previously uploaded to Play**, across all tracks and drafts, after inspecting Play Console. Syntax validation cannot prove a code is unused; no Play read is performed by the metadata helper. Set/read back the tag variable before pushing each approved release tag. `PLAY_VERSION_CODE_BASE` is no longer used.
 - `PLAY_UPLOAD_ENABLED`: leave unset for bootstrap; set to exactly `true` **only after** first compatible upload, API permissions and target-API checks are complete. Requested uploads (including tags) fail clearly while unset; they do not silently report success without uploading. Manual build-only remains available.
 
 Current environment setup: all five secret names above were configured and read back as GitHub metadata only (secret values cannot be read back). Environment `google-play` allows only exact branches `main` and `ci/google-play-internal-drafts`; no wildcard branch access. The latter is a temporary approved signing-validation exception, not upload authority. The tag deployment policy is NOT enabled yet. Remove the exception after merging/release review, protect release tags, then add the approved tag rule before enabling tag uploads.
@@ -36,9 +36,9 @@ Current environment setup: all five secret names above were configured and read 
 
 ### Manual build-only (first upload / diagnosis)
 
-After reviewed code is merged to `main`, open **Actions → Google Play internal draft → Run workflow**, choose **main**, leave `upload=false`. It builds a signed non-debug **AAB**, not an APK, and saves `listenup.aab`, `SHA256SUMS` and `release.json` for 14 days. Download the artifact and verify its SHA256; inspect version/target/package/certificate before first manual upload. An API-36 build is configured but remains unverified until a hosted native build succeeds.
+After reviewed code is merged to `main`, open **Actions → Google Play internal draft → Run workflow**, choose **main**, enter the checked `version_code`, and leave `upload=false`. It builds a signed non-debug **AAB**, not an APK, and saves `listenup.aab`, `SHA256SUMS` and `release.json` for 14 days. Download the artifact and verify its SHA256; inspect version/target/package/certificate before first manual upload. Signed API-36 builds passed before this version-code change; build and verify a fresh candidate after merge.
 
-Before merge, the already-existing **Android APK** workflow can be dispatched on the exact approved PR branch with `signed_bundle=true`. It calls the same reusable AAB build with `upload=false`, skips duplicate preview work and cannot upload from that branch. This exercises signing on hosted x86_64 without requiring a merge or exposing secrets to pull-request events. Do not extend this exception to arbitrary refs.
+The **Android APK** workflow also accepts `version_code` when dispatched with `signed_bundle=true`. It calls the same reusable AAB build with `upload=false`; omitting the code fails before signing. Preview APK builds need no code. The existing temporary `ci/google-play-internal-drafts` exception is not extended to new PR branches; validate a fresh signed candidate from main after review and merge.
 
 ### Automatic tag → internal draft
 
@@ -46,7 +46,7 @@ Update `expo.version` in `app.json` through a tested/reviewed change on main, th
 
 Nothing is published to testers or production automatically. Finish reviewing the draft and release notes in Play Console; any rollout is a separate human action. Do not run the workflow against a different numeric Console track expecting it to change API `internal`.
 
-Manual `upload=true` does the same draft upload with a new generated version code, from main only. No arbitrary-ref input, pull-request deployment or production-track selector exists.
+Manual `upload=true` does the same draft upload with the explicitly selected `version_code`, from main only. No arbitrary-ref input, pull-request deployment or production-track selector exists.
 
 ## Verification / troubleshooting
 
@@ -55,7 +55,7 @@ Manual `upload=true` does the same draft upload with a new generated version cod
 - Signed artifact and SHA256 are passed between build/upload jobs from the same run; the expected hash is a separate build-job output. The Play readback verifies both internal-draft versionCode and the server's bundle SHA256. Release metadata records source SHA and public upload certificate fingerprint, never private material.
 - Upload job is serial; in-progress releases are not cancelled by newer tags. GitHub concurrency allows one running/one pending per group; a newer request can replace a pending one. This is **not a durable queue** guaranteeing every rapid tag uploads. Create release tags one at a time and wait for completion.
 - Draft/readback failure: inspect Play Console before retrying; an upload may already have committed even if verification/network failed. There is no automatic production promotion, edit retry or version-code rollback.
-- Re-running only a failed upload job reuses its original build artifact and versionCode, not the retry's artifact name. If Play already committed that version, it can reject re-upload. Inspect first; a full rerun mints a fresh versionCode and can create or replace the internal draft.
+- Re-running a workflow or failed upload job retains its explicitly selected versionCode; it does not mint a fresh code. If Play already committed that version, it can reject re-upload. Inspect Play first after an ambiguous failure. To submit another bundle, start a new dispatch with a newly checked unused code, or update/read back the tag variable before a separately approved tag run. Never assume a rerun is safe just because its GitHub attempt number increased.
 - If Play says `changesNotSentForReview must not be set`, stop and inspect that app's review mode. The flag is deliberately true here; do not automatically toggle it or retry a potentially committed release. Adjust only through a reviewed workflow change for the confirmed app state.
 - API 403: check app-specific Play permissions, API enablement and first manual upload; Cloud IAM roles alone are insufficient.
 - Signing mismatch: stop and recover the existing upload key or use Google's approved upload-key reset process. Never silently switch signing identities.

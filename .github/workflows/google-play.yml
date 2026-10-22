@@ -3,6 +3,10 @@ name: Google Play internal draft
 on:
   workflow_call:
     inputs:
+      version_code:
+        description: 'Unused Android versionCode selected after checking Play Console'
+        type: string
+        required: true
       upload:
         type: boolean
         default: false
@@ -11,6 +15,10 @@ on:
     tags: ['v*']
   workflow_dispatch:
     inputs:
+      version_code:
+        description: 'Unused Android versionCode, greater than every code uploaded to Play'
+        type: string
+        required: true
       upload:
         description: 'Upload an internal-testing DRAFT (first upload must be manual in Play Console)'
         type: boolean
@@ -61,7 +69,7 @@ jobs:
       - name: Validate trigger, version and upload opt-in
         id: release
         env:
-          PLAY_VERSION_CODE_BASE: ${{ vars.PLAY_VERSION_CODE_BASE }}
+          PLAY_VERSION_CODE: ${{ github.event_name == 'push' && vars.PLAY_VERSION_CODE || inputs.version_code }}
           PLAY_UPLOAD_ENABLED: ${{ vars.PLAY_UPLOAD_ENABLED }}
           PLAY_UPLOAD_REQUESTED: ${{ inputs.upload }}
         run: node scripts/play-release.mjs

@@ -17,11 +17,9 @@ export function releaseMetadata(env, config) {
     if (!/^[1-9]\d*$/.test(value ?? '') || !Number.isSafeInteger(Number(value))) throw new Error(`Invalid ${name}`);
     return Number(value);
   };
-  const base = integer(env.PLAY_VERSION_CODE_BASE || '1000000', 'version-code base');
-  const run = integer(env.GITHUB_RUN_NUMBER, 'run number');
-  const attempt = integer(env.GITHUB_RUN_ATTEMPT, 'run attempt');
-  if (attempt > 99) throw new Error('Too many attempts; start a new run');
-  const code = base + run * 100 + attempt;
+  // Workflow-local run counters reset when workflows move or are renamed.
+  // The release owner selects an unused code after checking Play Console.
+  const code = integer(env.PLAY_VERSION_CODE, 'version code (set the explicit version_code input or PLAY_VERSION_CODE variable)');
   if (!Number.isSafeInteger(code) || code > 2100000000) throw new Error('Version code exceeds Play limit');
   if (requested && env.PLAY_UPLOAD_ENABLED !== 'true') throw new Error('Enable PLAY_UPLOAD_ENABLED only after first-upload/API/SDK setup; manual build-only remains available');
   return { version, versionCode: code, upload: requested };
