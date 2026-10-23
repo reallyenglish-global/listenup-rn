@@ -1,4 +1,4 @@
-"""Read back exact draft in a fresh Play edit, then discard that verification edit."""
+"""Read back exact release in a fresh Play edit, then discard that verification edit."""
 import base64
 import json
 import os
@@ -30,12 +30,14 @@ def json_request(url, method='GET', body=None, token=None, form=False):
         raise RuntimeError(f'Play verification HTTP {exc.code}; inspect Play Console before retrying') from None
 
 
-def check_track(track, code):
-    if track.get('track') != 'internal' or not any(
-        r.get('status') == 'draft' and str(code) in r.get('versionCodes', [])
+def check_track(track, code, expected_track='internal', expected_status='draft'):
+    if expected_track not in ('internal', 'production') or expected_status not in ('draft', 'completed'):
+        raise ValueError('Invalid expected Play destination or status')
+    if track.get('track') != expected_track or not any(
+        r.get('status') == expected_status and str(code) in r.get('versionCodes', [])
         for r in track.get('releases', [])
     ):
-        raise ValueError('Expected versionCode not found as an internal draft; inspect Play Console before retrying')
+        raise ValueError('Expected versionCode not found on requested track with requested status; inspect Play Console before retrying')
 
 
 def check_bundle(bundles, code, sha256):
@@ -51,6 +53,10 @@ def main():
         raise ValueError('Invalid expected bundle SHA256')
     if not re.fullmatch(r'[1-9][0-9]*', code):
         raise ValueError('Invalid versionCode')
+    track = os.environ['PLAY_TRACK']
+    status = os.environ['PLAY_STATUS']
+    if track not in ('internal', 'production') or status not in ('draft', 'completed'):
+        raise ValueError('Invalid expected Play destination or status')
     account = json.loads(os.environ['PLAY_SERVICE_ACCOUNT_JSON'])
     if account.get('type') != 'service_account':
         raise ValueError('Expected service-account JSON')
@@ -73,7 +79,7 @@ def main():
         raise RuntimeError('Unexpected Play edit ID')
     checked = False
     try:
-        check_track(json_request(BASE + '/' + edit + '/tracks/internal', token=token), code)
+        check_track(json_request(BASE + '/' + edit + '/tracks/' + track, token=token), code, track, status)
         check_bundle(json_request(BASE + '/' + edit + '/bundles', token=token), code, sha256)
         checked = True
     finally:
@@ -85,8 +91,8 @@ def main():
             if checked:
                 raise
     with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
-        summary.write(f'### Verified Play internal draft\nVersion code {code} and SHA256 {sha256} were read back as an internal draft. No rollout started.\n')
-    print(f'Verified internal draft versionCode {code}')
+        summary.write(f'### Verified Play upload\nVersion code {code} and SHA256 {sha256} were read back on {track} with status {status}. Play review/availability and device acceptance remain separate.\n')
+    print(f'Verified {track} {status} versionCode {code}')
 
 
 if __name__ == '__main__':

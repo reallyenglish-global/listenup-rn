@@ -12,7 +12,7 @@ on:
         type: string
         required: false
       signed_bundle:
-        description: 'Also build a signed AAB (approved release branch only; never upload)'
+        description: 'Also build a signed AAB (main only; never upload)'
         type: boolean
         default: false
         required: false

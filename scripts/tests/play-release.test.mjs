@@ -5,10 +5,10 @@ import { releaseMetadata } from '../play-release.mjs';
 const require = createRequire(import.meta.url);
 const appConfig = require('../../app.config.js');
 const config = { expo: { version: '1.0.0', android: { package: 'com.reallyenglish.listenup' } } };
-const env = { GITHUB_EVENT_NAME: 'push', GITHUB_REF: 'refs/tags/v1.0.0', GITHUB_RUN_NUMBER: '10', GITHUB_RUN_ATTEMPT: '1', PLAY_VERSION_CODE: '1001001', PLAY_UPLOAD_ENABLED: 'true' };
+const env = { GITHUB_EVENT_NAME: 'workflow_dispatch', GITHUB_REF: 'refs/heads/main', GITHUB_RUN_NUMBER: '10', GITHUB_RUN_ATTEMPT: '1', PLAY_VERSION_CODE: '1001001', PLAY_UPLOAD_ENABLED: 'true' };
 
-test('matching version tag requests internal draft upload', () => {
-  assert.deepEqual(releaseMetadata(env, config), { version: '1.0.0', versionCode: 1001001, upload: true });
+test('main defaults to build-only internal draft', () => {
+  assert.deepEqual(releaseMetadata(env, config), { version: '1.0.0', versionCode: 1001001, upload: false, track: 'internal', status: 'draft' });
 });
 test('manual defaults to build only on main', () => {
   assert.equal(releaseMetadata({ ...env, GITHUB_EVENT_NAME: 'workflow_dispatch', GITHUB_REF: 'refs/heads/main', PLAY_UPLOAD_ENABLED: '' }, config).upload, false);
@@ -16,19 +16,39 @@ test('manual defaults to build only on main', () => {
 test('manual upload requires explicit input and setup switch', () => {
   assert.equal(releaseMetadata({ ...env, GITHUB_EVENT_NAME: 'workflow_dispatch', GITHUB_REF: 'refs/heads/main', PLAY_UPLOAD_REQUESTED: 'true' }, config).upload, true);
 });
-test('exact approved PR branch permits signing validation but never upload', () => {
-  const branch = { ...env, GITHUB_EVENT_NAME: 'workflow_dispatch', GITHUB_REF: 'refs/heads/ci/google-play-internal-drafts' };
-  assert.equal(releaseMetadata(branch, config).upload, false);
-  assert.throws(() => releaseMetadata({ ...branch, PLAY_UPLOAD_REQUESTED: 'true' }, config));
+test('every non-main ref is denied even for build-only', () => {
+  for (const ref of ['refs/heads/ci/google-play-internal-drafts', 'refs/heads/feature', 'refs/tags/v1.0.0', 'refs/pull/1/merge']) {
+    for (const upload of ['false', 'true']) {
+      assert.throws(() => releaseMetadata({ ...env, GITHUB_REF: ref, PLAY_UPLOAD_REQUESTED: upload }, config), /manual dispatch on main/);
+    }
+  }
 });
-test('tags cannot silently skip requested uploads before setup', () => {
-  assert.throws(() => releaseMetadata({ ...env, PLAY_UPLOAD_ENABLED: 'false' }, config), /Enable PLAY_UPLOAD_ENABLED/);
+test('testing and production drafts and confirmed rollouts are explicit', () => {
+  for (const track of ['internal', 'production']) {
+    for (const status of ['draft', 'completed']) {
+      const request = { ...env, PLAY_UPLOAD_REQUESTED: 'true', PLAY_TRACK: track, PLAY_STATUS: status };
+      if (status === 'completed') assert.throws(() => releaseMetadata(request, config), /confirm_release/);
+      const result = releaseMetadata({ ...request, PLAY_CONFIRM_RELEASE: 'true' }, config);
+      assert.equal(result.track, track);
+      assert.equal(result.status, status);
+      assert.equal(result.upload, true);
+    }
+  }
+});
+test('reject arbitrary tracks and statuses', () => {
+  for (const track of ['beta', '../production', 'Production']) assert.throws(() => releaseMetadata({ ...env, PLAY_TRACK: track }, config));
+  for (const status of ['inProgress', 'halted', 'invalid']) assert.throws(() => releaseMetadata({ ...env, PLAY_STATUS: status }, config));
+});
+test('requested uploads fail before setup', () => {
+  assert.throws(() => releaseMetadata({ ...env, PLAY_UPLOAD_REQUESTED: 'true', PLAY_UPLOAD_ENABLED: 'false' }, config), /Enable PLAY_UPLOAD_ENABLED/);
 });
 test('reject mismatched and injected tags, arbitrary refs and PR events', () => {
-  for (const ref of ['refs/tags/v1.0.1', 'refs/tags/v1.0.0-rc.1', 'refs/heads/main', 'refs/tags/v1.0.0;echo bad']) {
+  for (const ref of ['refs/tags/v1.0.1', 'refs/tags/v1.0.0-rc.1', 'refs/heads/not-main', 'refs/tags/v1.0.0;echo bad']) {
     assert.throws(() => releaseMetadata({ ...env, GITHUB_REF: ref }, config));
   }
-  assert.throws(() => releaseMetadata({ ...env, GITHUB_EVENT_NAME: 'pull_request' }, config));
+  for (const event of ['push', 'pull_request', 'schedule', 'workflow_call']) {
+    assert.throws(() => releaseMetadata({ ...env, GITHUB_EVENT_NAME: event }, config), /manual dispatch on main/);
+  }
   assert.throws(() => releaseMetadata({ ...env, GITHUB_EVENT_NAME: 'workflow_dispatch', GITHUB_REF: 'refs/heads/feature' }, config));
 });
 test('reject wrong package and invalid app versions', () => {

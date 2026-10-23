@@ -56,6 +56,20 @@ class PlayReadbackTests(unittest.TestCase):
     def test_exact_internal_draft_required(self):
         upload.check_track({'track': 'internal', 'releases': [{'status': 'draft', 'versionCodes': ['1001001']}]}, '1001001')
 
+    def test_each_selected_track_and_status_is_verified(self):
+        for track in ('internal', 'production'):
+            for status in ('draft', 'completed'):
+                response = {'track': track, 'releases': [{'status': status, 'versionCodes': ['1001001']}]}
+                upload.check_track(response, '1001001', track, status)
+                with self.assertRaises(ValueError):
+                    upload.check_track(response, '1001001', 'production' if track == 'internal' else 'internal', status)
+                with self.assertRaises(ValueError):
+                    upload.check_track(response, '1001001', track, 'draft' if status == 'completed' else 'completed')
+                with self.assertRaises(ValueError):
+                    upload.check_track(response, '1', track, status)
+        with self.assertRaises(ValueError):
+            upload.check_track({}, '1001001', '../production', 'completed')
+
     def test_wrong_track_status_version_or_missing_release_rejected(self):
         for track in [
             {'track': 'production', 'releases': [{'status': 'draft', 'versionCodes': ['1001001']}]},
