@@ -1,4 +1,4 @@
-name: Google Play internal draft
+name: Google Play signed release
 
 on:
   workflow_call:
@@ -11,8 +11,6 @@ on:
         type: boolean
         default: false
         required: false
-  push:
-    tags: ['v*']
   workflow_dispatch:
     inputs:
       version_code:
@@ -20,7 +18,25 @@ on:
         type: string
         required: true
       upload:
-        description: 'Upload an internal-testing DRAFT (first upload must be manual in Play Console)'
+        description: 'Upload to Play (first upload must be manual in Play Console)'
+        type: boolean
+        default: false
+        required: true
+
+      track:
+        description: 'Play destination: internal testing or production release'
+        type: choice
+        options: [internal, production]
+        default: internal
+        required: true
+      status:
+        description: 'draft saves for review; completed submits a tester/production rollout'
+        type: choice
+        options: [draft, completed]
+        default: draft
+        required: true
+      confirm_release:
+        description: 'Authorize rollout when upload=true and status=completed'
         type: boolean
         default: false
         required: true
@@ -35,9 +51,7 @@ concurrency:
 
 jobs:
   build:
-    if: >-
-      github.event_name == 'push' || github.ref == 'refs/heads/main' ||
-      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/ci/google-play-internal-drafts' && !inputs.upload)
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     environment: google-play
@@ -45,6 +59,8 @@ jobs:
       upload: ${{ steps.release.outputs.upload }}
       version: ${{ steps.release.outputs.version }}
       version_code: ${{ steps.release.outputs.version_code }}
+      track: ${{ steps.release.outputs.track }}
+      status: ${{ steps.release.outputs.status }}
       artifact: listenup-play-${{ github.sha }}-${{ github.run_number }}-${{ github.run_attempt }}
       aab_sha256: ${{ steps.bundle.outputs.aab_sha256 }}
     steps:
@@ -52,15 +68,10 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: Require main ancestry or exact build-only validation branch
-        env:
-          UPLOAD_INPUT: ${{ inputs.upload }}
+      - name: Require main source
         run: |
-          if [[ "$GITHUB_EVENT_NAME" == workflow_dispatch && "$GITHUB_REF" == refs/heads/ci/google-play-internal-drafts && "$UPLOAD_INPUT" != true ]]; then
-            printf 'Signing validation on approved PR branch; Play upload is forbidden.\n'
-          else
-            git merge-base --is-ancestor HEAD origin/main
-          fi
+          [[ "$GITHUB_REF" == refs/heads/main ]]
+          git merge-base --is-ancestor HEAD origin/main
       - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4; uses packageManager pin
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
@@ -69,9 +80,12 @@ jobs:
       - name: Validate trigger, version and upload opt-in
         id: release
         env:
-          PLAY_VERSION_CODE: ${{ github.event_name == 'push' && vars.PLAY_VERSION_CODE || inputs.version_code }}
+          PLAY_VERSION_CODE: ${{ inputs.version_code }}
           PLAY_UPLOAD_ENABLED: ${{ vars.PLAY_UPLOAD_ENABLED }}
           PLAY_UPLOAD_REQUESTED: ${{ inputs.upload }}
+          PLAY_TRACK: ${{ inputs.track }}
+          PLAY_STATUS: ${{ inputs.status }}
+          PLAY_CONFIRM_RELEASE: ${{ inputs.confirm_release }}
         run: node scripts/play-release.mjs
       - name: Check signing configuration exists (never print values)
         env:
@@ -138,14 +152,14 @@ jobs:
         run: |
           printf '### ListenUp signed AAB\nVersion code: %s\n\n' "$VERSION_CODE" >> "$GITHUB_STEP_SUMMARY"
           if [[ "$UPLOAD" == 'true' ]]; then
-            printf 'Internal draft upload requested; see upload job for actual outcome.\n' >> "$GITHUB_STEP_SUMMARY"
+            printf 'Play upload requested; see upload job for verified destination and outcome.\n' >> "$GITHUB_STEP_SUMMARY"
           else
             printf 'Build only; nothing uploaded.\n' >> "$GITHUB_STEP_SUMMARY"
           fi
 
   upload:
     needs: build
-    if: needs.build.outputs.upload == 'true'
+    if: github.ref == 'refs/heads/main' && needs.build.outputs.upload == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     environment: google-play
@@ -168,23 +182,25 @@ jobs:
         run: |
           [[ "$EXPECTED_SHA256" =~ ^[0-9a-f]{64}$ ]]
           printf '%s  play-artifact/listenup.aab\n' "$EXPECTED_SHA256" | sha256sum --check
-      - name: Upload internal-testing draft (never production)
+      - name: Upload signed release to selected Play track
         id: play
         uses: r0adkll/upload-google-play@e738b9dd8f2476ea806d921b64aacd24f34515a5 # v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: com.reallyenglish.listenup
           releaseFiles: play-artifact/listenup.aab
-          track: internal
-          status: draft
+          track: ${{ needs.build.outputs.track }}
+          status: ${{ needs.build.outputs.status }}
           releaseName: ListenUp ${{ needs.build.outputs.version }} (${{ needs.build.outputs.version_code }})
-          changesNotSentForReview: true
+          changesNotSentForReview: ${{ needs.build.outputs.status == 'draft' }}
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
-      - name: Read back exact internal draft through Play API
+      - name: Read back exact track, status and bundle through Play API
         env:
           PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
           PLAY_VERSION_CODE: ${{ needs.build.outputs.version_code }}
           PLAY_AAB_SHA256: ${{ needs.build.outputs.aab_sha256 }}
+          PLAY_TRACK: ${{ needs.build.outputs.track }}
+          PLAY_STATUS: ${{ needs.build.outputs.status }}
         run: python3 scripts/verify-play-upload.py

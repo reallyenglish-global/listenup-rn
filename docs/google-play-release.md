@@ -1,76 +1,80 @@
-# ListenUp: signed Google Play internal drafts
+# ListenUp: main-only signed Google Play releases
 
-Repository: `reallyenglish-global/listenup-rn`. Android application ID: `com.reallyenglish.listenup`.
+Repository: `reallyenglish-global/listenup-rn`. Android package: `com.reallyenglish.listenup`.
 
-This workflow is **prepared, not enabled or release-verified**. It adds no production rollout and does not change the existing preview APK workflow. Native signed AAB execution, upload-key identity, and Play release/write permission are still unverified. The Console app/track numeric IDs in browser links are **not** Android package names or Publisher API track identifiers. Confirm this Console app is intended for this package before its first upload; package identity becomes fixed.
+## Safety and prerequisites
 
-## Current blockers / first-time setup
+The signed workflow runs **only by manual dispatch on `main`**. Pushes, tags and PRs do not build/sign/upload releases. Both jobs check the main ref, and the metadata policy independently rejects other refs/events. Application/preview CI still runs on PRs so workflow changes can be checked before merge. Merging does **not** authorize or trigger a Play upload.
 
-1. **Validate the upgraded Android toolchain.** This branch upgrades Expo 51 → 52 → 53 → 54, RN to 0.81.5 and React to 19.1.0. Expo 54's real RN version catalog specifies compile/target API **36**, build-tools 36.0.0 and NDK 27.1.12297006; both workflows use those packages. Legacy architecture remains explicit because TrackPlayer 4.x requires it; Reanimated 3.19.x is intentionally pinned/excluded from Expo's 4.x recommendation. `react-native-track-player@4.1.2` also needs the committed pnpm patch for its two nullable `originalItem` conversions under Kotlin 2.1; it preserves `null` results. The React-19 renderer test uses async act without replacing its snapshot. The upload guard still rejects target API <36. Native compilation, device/audio validation and Play acceptance are distinct checks; do not infer them from package installation or prebuild. See [Google's live policy](https://support.google.com/googleplay/android-developer/answer/11926878).
-2. **Confirm signing ownership.** Use a dedicated upload key whose certificate matches the one registered for this app in Play Console. The GitHub environment lists the expected signing secret names, but secret metadata alone does not verify their values, certificate identity or recoverability. Do not reuse or rotate another app's upload key without explicit approval and a confirmed certificate match. Keep the private key out of the repository and arrange secure, recoverable backups before first release. Enrol through Play App Signing, where Google holds the separate app-signing key. Never send private keys/passwords in chat, issue comments or PRs.
-3. **Bootstrap in Play Console.** Complete required app setup/agreements, listings, content/data-safety declarations and app-signing enrolment. Upload the first compatible signed AAB manually to the intended internal-testing track. Download a manual build-only workflow artifact after the toolchain upgrade. An app shell alone does not prove Publisher API bootstrap is complete. Check the upload certificate and package agree with CI before continuing. Do not submit or roll out to production as part of setup.
-4. **Authorize the existing Mobile API account for ListenUp.** At Joey's request this reuses Mobile's existing `google-play@re-global-prod.iam.gserviceaccount.com` credential from the secret manager, not a new Cloud account/key. The API was already enabled. After app access was added, a real read-only request for the internal-track releases of `com.reallyenglish.listenup` returned **HTTP 200** and one visible release, confirming app/view access. This does not verify release/write permission; no edit or upload was attempted. Do not grant production release, billing, administrator or new production Cloud IAM roles. Changing a private key cannot fix a Play-side app-access denial. The credential is configured in the GitHub environment without exposing its value.
-5. **GitHub environment.** The existing `google-play` environment has exact deployment branches `main` and the temporary PR branch `ci/google-play-internal-drafts`. Secret names are configured; values are write-only and were not read. Before any upload, remove the temporary PR exception, protect release tags, add only the approved tag policy, and restrict who can create tags or update workflows. Consider required reviewers before jobs can access signing/API secrets (both signed-build and upload jobs reference the environment). Workflows are SHA-pinned; changes to workflows/actions still require review. Native build dependencies execute in the signing process tree; dependency updates are also part of the release trust boundary.
-6. **Actions capacity.** Confirm the organization has Actions budget/capacity. A run that cannot start due to billing is not passing CI. This automation does not change billing, branch protection or repository settings.
+Before uploading:
 
-## Secret and variable names
+1. Check the intended Play Console app, first manual AAB upload, listings, declarations, Play App Signing enrolment, and package identity. Numeric Console IDs are not Publisher API track names.
+2. Verify that the dedicated upload key certificate matches Play Console and has a secure recoverable backup. Never rotate another app's key or expose private keys/passwords in Git, chat or artifacts.
+3. Confirm app-specific release permissions for the service account; production release permission is needed only for an explicitly authorized production run. Prior read-only API access does not prove upload/write authority. Do not grant billing/admin or unrelated Cloud IAM roles.
+4. Restrict the `google-play` environment to exact branch `main`, remove any legacy signing-validation exception, and consider required reviewers before secrets become available. This code change does not modify environment settings or permissions.
+5. Verify Actions capacity and a fresh signed native candidate, including physical-device/audio testing. CI policy tests alone do not prove Play acceptance.
 
-Put these **environment secrets** in `google-play`:
+## Configuration
 
-- `PLAY_KEYSTORE_BASE64`: base64-encoded upload keystore, **one line** (for example `base64 -w 0 /secure/path/upload.jks` on Linux, redirect output to a private file rather than terminal/chat). No debug keystore.
-- `PLAY_STORE_PASSWORD`: keystore password.
-- `PLAY_KEY_ALIAS`: upload-key alias.
-- `PLAY_KEY_PASSWORD`: upload-key password.
-- `PLAY_SERVICE_ACCOUNT_JSON`: complete dedicated service-account JSON, used only by the upload job.
+Configure these **environment secrets** in `google-play`:
 
-Secret existence is checked without printing values. The keystore is decoded with mode 0600 in runner temp only for signing and removed on script exit; runners are ephemeral. No keystore/password/JSON enters artifacts or Gradle build cache. Do not add secrets to `app.json`, `.env`, Gradle properties, Git, command arguments or logs.
+- `PLAY_KEYSTORE_BASE64`: one-line base64 upload keystore, not a debug keystore.
+- `PLAY_STORE_PASSWORD`, `PLAY_KEY_ALIAS`, `PLAY_KEY_PASSWORD`.
+- `PLAY_SERVICE_ACCOUNT_JSON`: complete authorized service-account JSON, used only in the upload job.
 
-Environment variables:
+Never print values. Signing material is decoded into runner temp with mode 0600 and removed on script exit; runners are ephemeral. Artifacts contain the signed AAB, checksum, source/version metadata and public certificate fingerprint, not private signing material.
 
-- `PLAY_VERSION_CODE`: required for tag-triggered releases; a positive decimal integer capped at 2,100,000,000. Manual and reusable calls instead require the explicit string input `version_code`. There is no generated fallback: GitHub run numbers are workflow-local and can reset after workflow changes (the first main build produced `1000101`, below the previous workflow's `1000901`). Select an unused code **greater than every code previously uploaded to Play**, across all tracks and drafts, after inspecting Play Console. Syntax validation cannot prove a code is unused; no Play read is performed by the metadata helper. Set/read back the tag variable before pushing each approved release tag. `PLAY_VERSION_CODE_BASE` is no longer used.
-- `PLAY_UPLOAD_ENABLED`: leave unset for bootstrap; set to exactly `true` **only after** first compatible upload, API permissions and target-API checks are complete. Requested uploads (including tags) fail clearly while unset; they do not silently report success without uploading. Manual build-only remains available.
+Set environment variable `PLAY_UPLOAD_ENABLED` to exactly `true` only after first-upload/bootstrap, signing, API permissions and target API setup are complete. Requested uploads fail while unset; build-only is still available. This change does not enable the variable or grant permissions.
 
-Current environment setup: all five secret names above were configured and read back as GitHub metadata only (secret values cannot be read back). Environment `google-play` allows only exact branches `main` and `ci/google-play-internal-drafts`; no wildcard branch access. The latter is a temporary approved signing-validation exception, not upload authority. The tag deployment policy is NOT enabled yet. Remove the exception after merging/release review, protect release tags, then add the approved tag rule before enabling tag uploads.
+Every dispatch requires an explicit `version_code`: an unused positive decimal integer at most 2,100,000,000, **greater than every code previously uploaded across all Play tracks and drafts**. Inspect Play Console before selecting it. The helper validates syntax, not global availability; workflow counters cannot safely allocate codes. The former tag variable `PLAY_VERSION_CODE` and release tags are no longer used to trigger releases.
 
-## Use
+## Run the workflow
 
-### Manual build-only (first upload / diagnosis)
+Open **Actions → Google Play signed release → Run workflow**, selecting **main**:
 
-After reviewed code is merged to `main`, open **Actions → Google Play internal draft → Run workflow**, choose **main**, enter the checked `version_code`, and leave `upload=false`. It builds a signed non-debug **AAB**, not an APK, and saves `listenup.aab`, `SHA256SUMS` and `release.json` for 14 days. Download the artifact and verify its SHA256; inspect version/target/package/certificate before first manual upload. Signed API-36 builds passed before this version-code change; build and verify a fresh candidate after merge.
+- `version_code`: the checked unused Android versionCode.
+- `upload`: defaults to `false` (build-only).
+- `track`: `internal` for testing (default), or `production` for public release.
+- `status`: `draft` (default, save for review), or `completed` (submit full rollout).
+- `confirm_release`: defaults to `false`; must be explicitly `true` for an uploaded `completed` release on either track.
 
-The **Android APK** workflow also accepts `version_code` when dispatched with `signed_bundle=true`. It calls the same reusable AAB build with `upload=false`; omitting the code fails before signing. Preview APK builds need no code. The existing temporary `ci/google-play-internal-drafts` exception is not extended to new PR branches; validate a fresh signed candidate from main after review and merge.
+### Build-only / first manual upload
 
-### Automatic tag → internal draft
+Leave `upload=false`. Download the signed non-debug **AAB**, `SHA256SUMS` and `release.json` from the run artifact (14-day retention). Check package/version/target/certificate/hash before a first manual upload. Track/status inputs do not publish anything when upload is false.
 
-Update `expo.version` in `app.json` through a tested/reviewed change on main, then create a matching tag such as `v1.0.0` on the intended main commit. Only `vX.Y.Z` matching that version is accepted; prerelease and mismatched tags fail. Tag creation/push requires release approval. Once configuration and compatible tooling are ready, the run builds/signs/verifies, uploads exactly to Publisher API `internal` with `status: draft` and `changesNotSentForReview: true`, then opens a fresh edit to read back that exact version as an internal draft and deletes the verification edit **without committing it**.
+The **Android APK** workflow also supports dispatch on main with `signed_bundle=true` and `version_code`; its reusable call is build-only (`upload=false`) and defaults to internal/draft metadata. Preview APK builds do not need a version code. Non-main signed calls are skipped and cannot access signing secrets.
 
-Nothing is published to testers or production automatically. Finish reviewing the draft and release notes in Play Console; any rollout is a separate human action. Do not run the workflow against a different numeric Console track expecting it to change API `internal`.
+### Internal testing
 
-Manual `upload=true` does the same draft upload with the explicitly selected `version_code`, from main only. No arbitrary-ref input, pull-request deployment or production-track selector exists.
+Choose `upload=true`, `track=internal`, `status=draft` to save a candidate without starting rollout. To submit to configured testers, choose `status=completed` and `confirm_release=true`. Confirm tester lists, distribution and release notes in Play Console separately. The workflow does not manage tester access.
 
-## Verification / troubleshooting
+### Production release
 
-- Package, versionName, versionCode, debug/test-only flags and upload target API are read from the **built AAB manifest**, not assumed from source config.
-- `jarsigner` verifies the actual AAB signature and its certificate is checked against the upload key. Checksum-pinned Google bundletool validates the archive.
-- Signed artifact and SHA256 are passed between build/upload jobs from the same run; the expected hash is a separate build-job output. The Play readback verifies both internal-draft versionCode and the server's bundle SHA256. Release metadata records source SHA and public upload certificate fingerprint, never private material.
-- Upload job is serial; in-progress releases are not cancelled by newer tags. GitHub concurrency allows one running/one pending per group; a newer request can replace a pending one. This is **not a durable queue** guaranteeing every rapid tag uploads. Create release tags one at a time and wait for completion.
-- Draft/readback failure: inspect Play Console before retrying; an upload may already have committed even if verification/network failed. There is no automatic production promotion, edit retry or version-code rollback.
-- Re-running a workflow or failed upload job retains its explicitly selected versionCode; it does not mint a fresh code. If Play already committed that version, it can reject re-upload. Inspect Play first after an ambiguous failure. To submit another bundle, start a new dispatch with a newly checked unused code, or update/read back the tag variable before a separately approved tag run. Never assume a rerun is safe just because its GitHub attempt number increased.
-- If Play says `changesNotSentForReview must not be set`, stop and inspect that app's review mode. The flag is deliberately true here; do not automatically toggle it or retry a potentially committed release. Adjust only through a reviewed workflow change for the confirmed app state.
-- API 403: check app-specific Play permissions, API enablement and first manual upload; Cloud IAM roles alone are insufficient.
-- Signing mismatch: stop and recover the existing upload key or use Google's approved upload-key reset process. Never silently switch signing identities.
-- Native SDK packages were upgraded together with Expo. Legacy TrackPlayer/Reanimated compatibility is deliberate; do not remove the legacy-architecture pin or blindly run Expo --fix to install Reanimated 4 until those native consumers are migrated and tested.
+Only after explicit release approval and successful testing, choose `upload=true`, `track=production`. `status=draft` saves for review; `status=completed` with `confirm_release=true` submits a **full production rollout**, not a staged percentage. Defaults never select production or publish. A completed API status does not prove review approval, immediate store availability or device acceptance; Play review and managed publishing can delay delivery. Do not run production merely to validate this workflow.
 
-Local checks (do not contact Play or require signing secrets):
+Drafts set `changesNotSentForReview=true`; completed submissions set it to false. The workflow does not retry with a different review flag or silently change the requested destination/status.
+
+## Verification and troubleshooting
+
+- Both signing and upload jobs use the `google-play` environment. Actions are SHA-pinned. Workflow, action and native dependency changes are part of the release trust boundary.
+- The built AAB manifest is checked for package, versionName/versionCode, debug/test-only flags and target API (uploads require API 36+). `jarsigner` verifies the signature/certificate and checksum-pinned bundletool validates the archive.
+- The upload job downloads only the artifact from its own run and checks its SHA256 against a separate build-job output. A fresh Play API edit reads back the **selected track, exact status, versionCode and server-side bundle SHA256**; that verification edit is deleted without committing it.
+- Upload success/readback is distinct from Play review, installed-device functionality and public availability. No live upload is exercised as part of PR CI.
+- Releases are serialized and in-progress runs are not cancelled. GitHub allows one running/one pending in a concurrency group, not a durable queue: submit runs one at a time and wait for completion.
+- After an ambiguous upload/readback/network failure, inspect Play Console before retrying. A release may already have committed. A rerun retains its versionCode and can fail with a duplicate; start a newly authorized dispatch with a fresh checked code if another bundle is needed. There is no automatic rollback, promotion or edit retry.
+- A review-flag error requires inspecting the app's review state, not an automatic toggle/retry. API 403 requires checking app-specific permissions, API enablement and bootstrap; Cloud IAM alone is insufficient.
+- Signing mismatch: recover the intended key or follow Google's approved reset procedure; never switch identity silently.
+- Expo 54 / RN 0.81.5 use API 36, build-tools 36.0.0 and NDK 27.1.12297006. TrackPlayer 4.x requires the explicit legacy architecture, Reanimated 3.19.x pin and committed Kotlin nullable-item patch. Do not blindly install Reanimated 4 or remove these compatibility constraints.
+
+Local checks (no Play writes or signing secrets):
 
 ```sh
 node --test scripts/tests/play-release.test.mjs
 python3 -m unittest discover -s scripts/tests -p 'test_*.py'
 shellcheck scripts/build-play-bundle.sh
 bash -n scripts/build-play-bundle.sh
-actionlint .github/workflows/google-play.yml
+actionlint .github/workflows/google-play.yml .github/workflows/android-apk.yml
 pnpm exec jest --ci --runInBand
-PLAY_VERSION_CODE=1001001 pnpm exec expo config --type public
 ```
 
-Tests use explicit synthetic policy fixtures, not fabricated Play results. Passing these is not proof of a signed native build, Play acceptance or a device test. Live upload/readback is intentionally not exercised until credentials, package, signing ownership and release authority are supplied.
+Policy/readback fixtures are synthetic tests, not evidence of a real Play upload. A separately authorized main dispatch is needed to verify the full signed-build/upload path.
