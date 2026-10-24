@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, useWindowDimensions } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from '@expo/vector-icons/FontAwesome';
 import Speakers from './Speakers';
 import FailedTimes from './FailedTimes';
 import { useSession } from '@/hooks/useSession';
@@ -15,6 +15,8 @@ const Introduction = ({ navigation }) => {
   if (!session) {
     return <Text>Loading...</Text>;
   }
+
+  if (session.isComplete()) return <Text>All stages complete!</Text>;
 
   const stage = session.getCurrentStage();
 

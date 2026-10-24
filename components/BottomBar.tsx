@@ -2,19 +2,20 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from '@expo/vector-icons/FontAwesome';
 
 type RootStackParamList = {
   Introduction: undefined;
   Listening: undefined;
-  // ... other screens
+  Test: undefined;
+  TranscriptReview: undefined;
 };
 
 type BottomBarNavigationProp = StackNavigationProp<RootStackParamList, 'Introduction'>;
 
 interface BottomBarProps {
   title: string;
-  target: string;
+  target: keyof RootStackParamList;
   showNext?: boolean;
 }
 
@@ -22,7 +23,7 @@ const BottomBar: React.FC<BottomBarProps> = ({ title, target, showNext=true }) =
   const navigation = useNavigation<BottomBarNavigationProp>();
 
   const handleClick = () => {
-    navigation.navigate(target);
+    navigation.replace(target);
   };
 
   return (

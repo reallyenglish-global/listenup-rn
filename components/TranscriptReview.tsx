@@ -1,18 +1,25 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import Slider from '@react-native-community/slider';
-import { ListeningSession } from '../services/ListeningSession';
+import { useSession } from '@/hooks/useSession';
 import HeaderBar from './HeaderBar';
 import { AudioPlayer } from './AudioPlayer';
-import BottomBar from './BottomBar';
 const TranscriptReview = ({ navigation, route }) => {
-  const stage = new ListeningSession().getCurrentStage();
+  const { session } = useSession();
+  const [saving, setSaving] = useState(false);
+  if (!session) return <Text>Loading...</Text>;
+  const stage = session.getCurrentStage();
+  const done = async () => {
+    if (saving) return;
+    setSaving(true);
+    await session.moveToNextStage();
+    navigation.replace('Introduction');
+  };
 
   return (
     <View style={styles.container}>
       <HeaderBar title={"Stage " + stage.number + ' - Transcript'} />
       <View style={styles.container}>
-      { console.log('================', stage) }
+
         <AudioPlayer
           audioUrl={stage.audioUrl}
           containerStyle={styles.audioPlayerContainer}
@@ -24,7 +31,9 @@ const TranscriptReview = ({ navigation, route }) => {
         <Text style={styles.transcriptText}>{stage.transcript}</Text>
       </ScrollView>
 
-      <BottomBar title="Done" target="Introduction" showNext={false}/>
+      <TouchableOpacity accessibilityRole="button" disabled={saving} onPress={done}>
+        <Text>{saving ? 'Saving...' : 'Done'}</Text>
+      </TouchableOpacity>
     </View>
   );
 };

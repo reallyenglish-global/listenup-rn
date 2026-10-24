@@ -1,0 +1,85 @@
+name: Web release
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      draft_release:
+        description: Create a draft GitHub web release (main only; no deployment)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Web build and E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm build:web
+      - name: Test the exact production export (desktop and mobile viewport)
+        run: pnpm test:e2e:web
+      - name: Package verified static export
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          mkdir -p web-release
+          printf '{"commit":"%s","run_id":"%s","run_attempt":"%s"}\n' "$SOURCE_SHA" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" > dist/release.json
+          tar -czf web-release/listenup-web.tar.gz -C dist .
+          cp dist/release.json web-release/release.json
+          (cd web-release && sha256sum listenup-web.tar.gz release.json > SHA256SUMS && sha256sum -c SHA256SUMS)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: listenup-web-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: web-release/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Browser test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-e2e-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 14
+
+  draft-release:
+    if: github.event_name == 'workflow_dispatch' && inputs.draft_release && github.ref == 'refs/heads/main'
+    needs: web
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: listenup-web-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: web-release
+      - name: Verify and create draft (not a deployment)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          (cd web-release && sha256sum -c SHA256SUMS)
+          gh release create "web-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" web-release/* \
+            --target "$SOURCE_SHA" --draft --title "ListenUp web ${SOURCE_SHA:0:12}" \
+            --notes "Browser-tested static export from $SOURCE_SHA. No hosting deployment performed. See docs/web-release.md."
