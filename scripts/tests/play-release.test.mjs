@@ -16,6 +16,11 @@ test('manual defaults to build only on main', () => {
 test('manual upload requires explicit input and setup switch', () => {
   assert.equal(releaseMetadata({ ...env, GITHUB_EVENT_NAME: 'workflow_dispatch', GITHUB_REF: 'refs/heads/main', PLAY_UPLOAD_REQUESTED: 'true' }, config).upload, true);
 });
+test('exact approved PR branch permits signing validation but never upload', () => {
+  const branch = { ...env, GITHUB_EVENT_NAME: 'workflow_dispatch', GITHUB_REF: 'refs/heads/ci/google-play-internal-drafts' };
+  assert.equal(releaseMetadata(branch, config).upload, false);
+  assert.throws(() => releaseMetadata({ ...branch, PLAY_UPLOAD_REQUESTED: 'true' }, config));
+});
 test('tags cannot silently skip requested uploads before setup', () => {
   assert.throws(() => releaseMetadata({ ...env, PLAY_UPLOAD_ENABLED: 'false' }, config), /Enable PLAY_UPLOAD_ENABLED/);
 });
