@@ -3,15 +3,21 @@ import stagesData from '../assets/audios/s1/stages.json';
 
 export interface Speaker {
   name: string;
-  image: string;
+  imageUrl: number;
 }
 
 export interface Stage {
   number: number;
-  question: string;
+  title: string;
   speakers: Speaker[];
-  audio: string;
-  duration: number;
+  audioUrl: number;
+  duration: string;
+  responses: [string, string];
+  difficulty: number;
+  context: string;
+  transcript: string;
+  questions: { body: string; options: string[] }[];
+  failedTimes: number;
 }
 
 export class StageManager {

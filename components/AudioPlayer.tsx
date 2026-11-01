@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Slider from '@react-native-community/slider';
-import TrackPlayer, { State, useProgress, usePlaybackState, useTrackPlayerEvents, Event } from 'react-native-track-player';
+import TrackPlayer, { State, Capability, AppKilledPlaybackBehavior, useProgress, usePlaybackState, useTrackPlayerEvents, Event } from 'react-native-track-player';
 import PlayButton from './PlayButton';
 
 let setup: Promise<void> | undefined;
@@ -23,12 +23,18 @@ const useAudioPlayer = (audioUrl: number) => {
     loading = loading.catch(() => {}).then(async () => {
       if (!active) return;
       if (!setup) {
-        setup = TrackPlayer.setupPlayer().catch(reason => { setup = undefined; throw reason; });
+        setup = (async () => {
+          await TrackPlayer.getPlaybackState().catch(() => TrackPlayer.setupPlayer());
+          await TrackPlayer.updateOptions({
+            capabilities: [Capability.Play, Capability.Pause, Capability.Stop, Capability.SeekTo],
+            android: { appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification },
+          });
+        })().catch(reason => { setup = undefined; throw reason; });
       }
       await setup;
       if (!active) return;
       await TrackPlayer.reset();
-      await TrackPlayer.add({ url: audioUrl, title: 'ListenUp', artist: 'ReallyEnglish' });
+      await TrackPlayer.add({ url: Image.resolveAssetSource(audioUrl).uri, title: 'ListenUp', artist: 'ReallyEnglish' });
       await TrackPlayer.setRate(1);
       if (active) setIsReady(true);
     }).catch(() => { if (active) setError(true); });
@@ -74,7 +80,7 @@ const useAudioPlayer = (audioUrl: number) => {
 };
 
 type Player = ReturnType<typeof useAudioPlayer>;
-const AudioPlayer = ({ player, showControls = true }: { player: Player; showControls?: boolean }) => {
+const AudioPlayer = ({ player, showControls = true, positionID = 'audio-position' }: { player: Player; showControls?: boolean; positionID?: string }) => {
   const { isReady, error, progress, playbackState, togglePlayPause, seekAudio } = player;
   const formatTime = (seconds: number) => {
     const value = Math.max(0, Math.floor(Number.isFinite(seconds) ? seconds : 0));
@@ -86,7 +92,7 @@ const AudioPlayer = ({ player, showControls = true }: { player: Player; showCont
     <View>
       {showControls && <PlayButton onPress={togglePlayPause} isPlaying={playbackState.state === State.Playing} />}
       <View style={styles.timeline}>
-        <Text testID="audio-position">{formatTime(progress.position)}</Text>
+        <Text testID={positionID}>{formatTime(progress.position)}</Text>
         <Slider
           accessibilityLabel="Audio position"
           style={styles.slider}

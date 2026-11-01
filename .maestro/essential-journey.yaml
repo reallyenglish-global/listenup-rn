@@ -6,6 +6,9 @@ name: Essential learner journey (real bundled audio and local storage)
 - assertVisible: "Stage 1"
 - assertVisible: "What makes you happy.*"
 - tapOn: "Start Listening"
+- assertVisible:
+    text: "Play audio"
+    enabled: true
 - tapOn: "Play audio"
 - assertVisible: "Pause audio"
 - extendedWaitUntil:
@@ -29,9 +32,17 @@ name: Essential learner journey (real bundled audio and local storage)
 - assertVisible: "Well done!"
 - tapOn: "OK"
 - assertVisible: "Stage 1 - Transcript"
-- assertVisible: ".*What makes you happy.*"
+- assertVisible: "(?s).*What makes you happy.*"
+- assertVisible:
+    text: "Play audio"
+    enabled: true
 - tapOn: "Play audio"
 - assertVisible: "Pause audio"
+- extendedWaitUntil:
+    visible:
+      id: "review-audio-position"
+      text: "0:0[2-9]|0:[12][0-9]"
+    timeout: 20000
 - tapOn: "Pause audio"
 - tapOn: "Done"
 - assertVisible: "Stage 2"
@@ -40,4 +51,4 @@ name: Essential learner journey (real bundled audio and local storage)
 - launchApp
 - assertVisible: "Stage 2"
 - assertVisible: "What do you do.*"
-- takeScreenshot: essential-journey-completed
+- takeScreenshot: e2e-results/essential-journey-completed

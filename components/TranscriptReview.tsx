@@ -1,24 +1,26 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import Slider from '@react-native-community/slider';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { useSession } from '../hooks/useSession';
 import { Alert } from 'react-native';
 import HeaderBar from './HeaderBar';
 import { AudioPlayer, useAudioPlayer } from './AudioPlayer';
 import BottomBar from './BottomBar';
-const TranscriptReview = ({ navigation, route }) => {
+const TranscriptReview = ({ navigation }) => {
   const { session } = useSession();
-  const stage = session!.getCurrentStage();
+  const [stage] = useState(() => session!.getCurrentStage());
   const player = useAudioPlayer(stage.audioUrl);
   const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false);
   const finish = async () => {
-    if (saving) return;
+    if (savingRef.current) return;
+    savingRef.current = true;
     setSaving(true);
     try {
       await session!.moveToNextStage();
       navigation.reset({ index: 0, routes: [{ name: 'Introduction' }] });
     } catch {
       Alert.alert('Progress not saved', 'Please try Done again.');
+      savingRef.current = false;
       setSaving(false);
     }
   };
@@ -29,6 +31,7 @@ const TranscriptReview = ({ navigation, route }) => {
       <View>
         <AudioPlayer
           player={player}
+          positionID="review-audio-position"
         />
       </View>
       <ScrollView style={styles.transcriptContainer}>

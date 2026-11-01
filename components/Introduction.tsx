@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, useWindowDimensions } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { FontAwesome as Icon } from '@expo/vector-icons';
 import Speakers from './Speakers';
 import FailedTimes from './FailedTimes';
@@ -9,7 +9,6 @@ import StageTitle from './StageTitle';
 import BottomBar from './BottomBar';
 
 const Introduction = ({ navigation }) => {
-  const { width, height } = useWindowDimensions();
   const { session } = useSession();
 
   if (!session) {

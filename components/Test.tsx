@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Challenge } from '@/services/Challenge';
 import HeaderBar from './HeaderBar';
@@ -11,7 +11,9 @@ const Test = ({ navigation }) => {
   const [questions, setQuestions] = useState<any[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [notification, setNotification] = useState(null);
-  const stage = session?.getCurrentStage();
+  const [stage] = useState(() => session!.getCurrentStage());
+  const answering = useRef(false);
+  useEffect(() => { answering.current = false; }, [currentQuestionIndex]);
 
   useEffect(() => {
     const initializeSession = async () => {
@@ -25,7 +27,8 @@ const Test = ({ navigation }) => {
   }, []);
 
   const handleOptionPress = async (option: string) => {
-    if (!challenge || notification) return;
+    if (!challenge || notification || answering.current) return;
+    answering.current = true;
 
     challenge.answer(currentQuestionIndex, option);
     if (currentQuestionIndex === questions.length - 1) {

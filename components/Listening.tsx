@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { FontAwesome as Icon } from '@expo/vector-icons';
-import { ListeningSession } from '@/services/ListeningSession';
 import Speakers from './Speakers';
 import HeaderBar from './HeaderBar';
 import StageTitle from './StageTitle';
@@ -12,7 +11,7 @@ import BottomBar from './BottomBar';
 
 const Listening = () => {
   const { session } = useSession();
-  const currentStage = session!.getCurrentStage();
+  const [currentStage] = useState(() => session!.getCurrentStage());
   const player = useAudioPlayer(currentStage.audioUrl);
   const { stopAudio, togglePlayPause, playbackState, playTimes, playSpeed, setSpeed } = player;
 
@@ -20,20 +19,10 @@ const Listening = () => {
     await setSpeed(speed);
   };
 
-  useEffect(() => {
-    const initializeSession = async () => {
-      await session.loadProgress();
-    };
-    return () => {
-      console.log('Unmounted', '========');
-      stopAudio();
-    };
-  }, []);
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-      <HeaderBar title={"Stage " + session.getCurrentStageNumber()} />
+      <HeaderBar title={"Stage " + currentStage.number} />
 
       <StageTitle title={currentStage.title} />
 

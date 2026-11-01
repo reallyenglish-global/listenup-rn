@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, View, Text, Pressable, StyleSheet } from 'react-native';
 
-export default function PopupNotification({ message, type, onClose }) {
+export default function PopupNotification({ message, type, onClose }: { message: string; type: string; onClose: () => void }) {
   return (
     <Modal transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.overlay}>
