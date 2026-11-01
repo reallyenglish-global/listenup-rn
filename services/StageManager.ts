@@ -1,16 +1,23 @@
+import { audioAssets, speakerAssets } from './lessonAssets';
 import stagesData from '../assets/audios/s1/stages.json';
 
 export interface Speaker {
   name: string;
-  image: string;
+  imageUrl: number;
 }
 
 export interface Stage {
   number: number;
-  question: string;
+  title: string;
   speakers: Speaker[];
-  audio: string;
-  duration: number;
+  audioUrl: number;
+  duration: string;
+  responses: [string, string];
+  difficulty: number;
+  context: string;
+  transcript: string;
+  questions: { body: string; options: string[] }[];
+  failedTimes: number;
 }
 
 export class StageManager {
@@ -29,12 +36,12 @@ export class StageManager {
       context: stage.situation,
       speakers: stage.speakers.map((speaker: any) => ({
         name: speaker.name,
-        imageUrl: `../assets/images/speakers/${speaker.image}@2x.png`
+        imageUrl: speakerAssets[speaker.image]
       })),
       // replace line breaks with <br />
       transcript: stage.transcript.replace(/\r/g, '\n'),
       questions: stage.mcqs,
-      audioUrl: `../assets/audios/s1/S${index + 1}.mp3`,
+      audioUrl: audioAssets[index],
       failedTimes: 0,
       duration: stage.duration
     }));

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Image, Text, StyleSheet } from 'react-native';
 
 interface SpeakerProps {
-  imageUrl: string;
+  imageUrl: number;
   name: string;
 }
 
@@ -11,7 +11,7 @@ const SPEAKER_IMAGE_HEIGHT = 150; // Should match the value in Introduction.tsx
 const Speaker: React.FC<SpeakerProps> = ({ imageUrl, name }) => {
   return (
     <View style={styles.speakerContainer}>
-      <Image source={{ uri: imageUrl }} style={styles.speakerImage} />
+      <Image source={imageUrl} style={styles.speakerImage} />
       <View style={styles.nameContainer}>
         <Text style={styles.speakerName}>{name}</Text>
       </View>

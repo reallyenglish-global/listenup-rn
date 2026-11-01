@@ -1,17 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Challenge } from '@/services/Challenge';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../types/navigation';
 import HeaderBar from './HeaderBar';
 import PopupNotification from './PopupNotification';
 import { useSession } from '@/hooks/useSession';
 
-const Test = ({ navigation }) => {
+const Test = ({ navigation }: { navigation: StackNavigationProp<RootStackParamList> }) => {
   const { session } = useSession();
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [questions, setQuestions] = useState<any[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [notification, setNotification] = useState(null);
-  const stage = session?.getCurrentStage();
+  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'warning' } | null>(null);
+  const [stage] = useState(() => session!.getCurrentStage());
+  const answering = useRef(false);
+  useEffect(() => { answering.current = false; }, [currentQuestionIndex]);
 
   useEffect(() => {
     const initializeSession = async () => {
@@ -25,18 +29,15 @@ const Test = ({ navigation }) => {
   }, []);
 
   const handleOptionPress = async (option: string) => {
-    if (!challenge) return;
+    if (!challenge || notification || answering.current) return;
+    answering.current = true;
 
     challenge.answer(currentQuestionIndex, option);
     if (currentQuestionIndex === questions.length - 1) {
       const passed = challenge.passed();
       if (passed) {
         showNotification(challenge.response(), 'success');
-        await session.moveToNextStage();
-        const newChallenge = new Challenge(stage);
-        setChallenge(newChallenge);
-        setQuestions(newChallenge.getQuestions());
-        setCurrentQuestionIndex(0);
+        // Keep the completed stage active until transcript review is done.
       } else {
         showNotification(challenge.response(), 'warning');
       }
@@ -49,15 +50,17 @@ const Test = ({ navigation }) => {
     }
   };
 
-  const showNotification = (message, type) => {
+  const showNotification = (message: string, type: 'success' | 'warning') => {
     setNotification({ message, type });
   };
 
   const hideNotification = () => {
+    if (!notification) return;
+    answering.current = false;
     if (notification.type === 'success') {
       navigation.navigate('TranscriptReview');
     } else if (notification.type === 'warning') {
-      navigation.navigate('Introduction');
+      navigation.reset({ index: 0, routes: [{ name: 'Introduction' }] });
     }
     setNotification(null);
   };
@@ -76,7 +79,7 @@ const Test = ({ navigation }) => {
           onClose={hideNotification}
         />
       )}
-      {questions[currentQuestionIndex].options.map((option, index) => (
+      {questions[currentQuestionIndex].options.map((option: string, index: number) => (
         <TouchableOpacity
           key={index}
           style={[

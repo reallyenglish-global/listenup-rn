@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import Speaker from './Speaker';
 
 interface SpeakerData {
-  imageUrl: string;
+  imageUrl: number;
   name: string;
 }
 

@@ -2,60 +2,35 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StageManager, Stage } from './StageManager';
 
 export class ListeningSession {
-  private currentStage: Stage;
-  private currentStageNumber: Number;
-  private stageManager: StageManager;
+  private stageManager = new StageManager();
+  private currentStage: Stage = this.stageManager.getStage(1)!;
 
-  constructor() {
-    this.stageManager = new StageManager();
-  }
-
-  getCurrentStage(): Stage {
-    return this.currentStage;
-  }
-
-  getCurrentStageNumber(): number {
-    return this.currentStage.number;
-  }
-
-  getTotalStages(): number {
-    return this.stageManager.getTotalStages();
-  }
-
-  getAllStages(): Stage[] {
-    return this.stageManager.getAllStages();
-  }
+  getCurrentStage(): Stage { return this.currentStage; }
+  getCurrentStageNumber(): number { return this.currentStage.number; }
+  getTotalStages(): number { return this.stageManager.getTotalStages(); }
+  getAllStages(): Stage[] { return this.stageManager.getAllStages(); }
 
   async moveToNextStage(): Promise<void> {
-    const nextStageNumber = this.currentStage.number + 1;
-    console.log('======', 'moveToNextStage', nextStageNumber);
-    this.currentStage = this.stageManager.getStage(nextStageNumber);
-    await this.saveProgress();
+    const next = this.stageManager.getStage(this.currentStage.number + 1);
+    // At the end of the bundled course, keep the final stage replayable.
+    if (!next) return;
+    // Persist first: do not display progress that a failed save cannot restore.
+    await AsyncStorage.setItem('@current_stage', JSON.stringify(next.number));
+    this.currentStage = next;
   }
 
   async saveProgress(): Promise<void> {
-    try {
-      await AsyncStorage.setItem('@current_stage', JSON.stringify(this.currentStage.number));
-    } catch (error) {
-      console.error('Error saving progress:', error);
-    }
+    await AsyncStorage.setItem('@current_stage', JSON.stringify(this.currentStage.number));
   }
 
   async loadProgress(): Promise<void> {
-    if (this.currentStage) {
-      return;
-    }
     try {
-      const savedStage = await AsyncStorage.getItem('@current_stage');
-      console.log('loaded stage', savedStage);
-      if (savedStage !== null) {
-        this.currentStageNumber = JSON.parse(savedStage);
-      } else {
-        this.currentStageNumber = 1;
-      }
-      this.currentStage = this.stageManager.getStage(this.currentStageNumber);
-    } catch (error) {
-      console.error('Error loading progress:', error);
+      const saved = await AsyncStorage.getItem('@current_stage');
+      const number = saved === null ? 1 : JSON.parse(saved);
+      this.currentStage = (Number.isInteger(number) && this.stageManager.getStage(number)) || this.stageManager.getStage(1)!;
+    } catch {
+      // Unavailable/corrupt local storage must not prevent a usable launch.
+      this.currentStage = this.stageManager.getStage(1)!;
     }
   }
 }

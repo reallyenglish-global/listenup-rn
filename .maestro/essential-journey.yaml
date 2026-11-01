@@ -1,0 +1,63 @@
+appId: com.reallyenglish.listenup
+name: Essential learner journey (real bundled audio and local storage)
+---
+- launchApp:
+    clearState: true
+- assertVisible: "Stage 1"
+- assertVisible: "What makes you happy.*"
+- tapOn: "Start Listening"
+- extendedWaitUntil:
+    visible:
+      text: "Play audio"
+      enabled: true
+    timeout: 20000
+- tapOn: "Play audio"
+- assertVisible: "Pause audio"
+- extendedWaitUntil:
+    visible:
+      id: "audio-position"
+      text: "0:0[2-9]|0:[12][0-9]"
+    timeout: 20000
+- tapOn: "Pause audio"
+- assertVisible: "Play audio"
+- tapOn: "Challenge"
+# Deliberately fail; alternatives are randomized but correctness is not.
+- tapOn: "At work|When she is working.*|In the office"
+- tapOn: "She never goes to restaurants.*"
+- assertVisible: "Try again"
+- tapOn: "OK"
+- assertVisible: "Stage 1"
+- tapOn: "Start Listening"
+- tapOn: "Challenge"
+- tapOn: "After work|When she finishes work.*"
+- tapOn: "She never goes to restaurants.*"
+- assertVisible: "Well done!"
+- tapOn: "OK"
+- assertVisible: "Stage 1 - Transcript"
+- assertVisible: "(?s).*What makes you happy.*"
+- extendedWaitUntil:
+    visible:
+      id: "review-audio-position"
+      text: "0:00"
+    timeout: 20000
+- extendedWaitUntil:
+    visible:
+      text: "Play audio"
+      enabled: true
+    timeout: 20000
+- tapOn: "Play audio"
+- assertVisible: "Pause audio"
+- extendedWaitUntil:
+    visible:
+      id: "review-audio-position"
+      text: "0:0[2-9]|0:[12][0-9]"
+    timeout: 20000
+- tapOn: "Pause audio"
+- tapOn: "Done"
+- assertVisible: "Stage 2"
+- assertVisible: "What do you do.*"
+- stopApp
+- launchApp
+- assertVisible: "Stage 2"
+- assertVisible: "What do you do.*"
+- takeScreenshot: e2e-results/essential-journey-completed
