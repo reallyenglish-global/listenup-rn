@@ -8,7 +8,7 @@ import HeaderBar from './HeaderBar';
 import StageTitle from './StageTitle';
 import BottomBar from './BottomBar';
 
-const Introduction = ({ navigation }) => {
+const Introduction = () => {
   const { session } = useSession();
 
   if (!session) {

@@ -62,3 +62,22 @@ test('finishing the final stage never persists a nonexistent stage', async () =>
   expect(session.getCurrentStageNumber()).toBe(total);
   expect(AsyncStorage.setItem).not.toHaveBeenCalledWith('@current_stage', String(total + 1));
 });
+
+
+test('storage read failure still launches a usable first lesson', async () => {
+  (AsyncStorage.getItem as jest.Mock).mockRejectedValueOnce(new Error('unavailable'));
+  const session = new ListeningSession();
+  await session.loadProgress();
+  expect(session.getCurrentStageNumber()).toBe(1);
+});
+
+test('failed progress save neither advances nor prevents retry', async () => {
+  (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
+  const session = new ListeningSession();
+  await session.loadProgress();
+  (AsyncStorage.setItem as jest.Mock).mockRejectedValueOnce(new Error('full'));
+  await expect(session.moveToNextStage()).rejects.toThrow('full');
+  expect(session.getCurrentStageNumber()).toBe(1);
+  await session.moveToNextStage();
+  expect(session.getCurrentStageNumber()).toBe(2);
+});

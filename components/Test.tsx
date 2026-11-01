@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Challenge } from '@/services/Challenge';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../types/navigation';
 import HeaderBar from './HeaderBar';
 import PopupNotification from './PopupNotification';
 import { useSession } from '@/hooks/useSession';
 
-const Test = ({ navigation }) => {
+const Test = ({ navigation }: { navigation: StackNavigationProp<RootStackParamList> }) => {
   const { session } = useSession();
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [questions, setQuestions] = useState<any[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [notification, setNotification] = useState(null);
+  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'warning' } | null>(null);
   const [stage] = useState(() => session!.getCurrentStage());
   const answering = useRef(false);
   useEffect(() => { answering.current = false; }, [currentQuestionIndex]);
@@ -48,11 +50,13 @@ const Test = ({ navigation }) => {
     }
   };
 
-  const showNotification = (message, type) => {
+  const showNotification = (message: string, type: 'success' | 'warning') => {
     setNotification({ message, type });
   };
 
   const hideNotification = () => {
+    if (!notification) return;
+    answering.current = false;
     if (notification.type === 'success') {
       navigation.navigate('TranscriptReview');
     } else if (notification.type === 'warning') {
@@ -75,7 +79,7 @@ const Test = ({ navigation }) => {
           onClose={hideNotification}
         />
       )}
-      {questions[currentQuestionIndex].options.map((option, index) => (
+      {questions[currentQuestionIndex].options.map((option: string, index: number) => (
         <TouchableOpacity
           key={index}
           style={[

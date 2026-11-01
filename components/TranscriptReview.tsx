@@ -2,10 +2,12 @@ import React, { useState, useRef } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { useSession } from '../hooks/useSession';
 import { Alert } from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../types/navigation';
 import HeaderBar from './HeaderBar';
 import { AudioPlayer, useAudioPlayer } from './AudioPlayer';
 import BottomBar from './BottomBar';
-const TranscriptReview = ({ navigation }) => {
+const TranscriptReview = ({ navigation }: { navigation: StackNavigationProp<RootStackParamList> }) => {
   const { session } = useSession();
   const [stage] = useState(() => session!.getCurrentStage());
   const player = useAudioPlayer(stage.audioUrl);

@@ -12,7 +12,7 @@ Answer alternatives and order remain randomized. The flows match the permitted w
 
 ## CI and diagnostics
 
-Open the Android APK check on the PR. The emulator job depends on the build artifact and has only `contents: read`; the existing signing job remains skipped for PRs. New runtime actions are SHA-pinned; Maestro 2.3.0 is downloaded from its versioned release and checksum-verified. The install/verification/test stages propagate failures.
+Open the Android APK check on the PR. The emulator job depends on the build artifact and has only `contents: read`; the existing signing job remains skipped for PRs. New runtime actions are SHA-pinned; Maestro 2.9.0 is downloaded from its versioned release and checksum-verified. The install/verification/test stages propagate failures.
 
 Artifacts:
 - `listenup-preview-apk-<workflow SHA>`: `app-release.apk`, `SHA256SUMS` (7 days).

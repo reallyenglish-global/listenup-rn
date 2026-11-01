@@ -118,4 +118,17 @@ name: Complete the bundled course without invalid progress
 - stopApp
 - launchApp
 - assertVisible: "Stage 10"
+- tapOn: "Start Listening"
+- extendedWaitUntil:
+    visible:
+      text: "Play audio"
+      enabled: true
+    timeout: 20000
+- tapOn: "Play audio"
+- extendedWaitUntil:
+    visible:
+      id: "audio-position"
+      text: "0:0[2-9]|0:[12][0-9]"
+    timeout: 20000
+- tapOn: "Pause audio"
 - takeScreenshot: e2e-results/course-completed-final-stage-replayable

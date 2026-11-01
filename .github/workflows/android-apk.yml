@@ -57,6 +57,9 @@ jobs:
       - name: Install JavaScript dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Typecheck
+        run: pnpm exec tsc --noEmit
+
       - name: Run tests
         run: pnpm test
 
@@ -97,7 +100,7 @@ jobs:
         run: sha256sum --check SHA256SUMS
       - name: Install pinned Maestro
         run: |
-          curl --fail --location --retry 3 -o maestro.zip https://github.com/mobile-dev-inc/Maestro/releases/download/cli-2.3.0/maestro.zip
+          curl --fail --location --retry 3 -o maestro.zip https://github.com/mobile-dev-inc/Maestro/releases/download/cli-2.9.0/maestro.zip
           printf '%s  maestro.zip\n' 855bb2ce1399d82f4f4a73d84a4d945f70b0d43eb86127e027af82809f63f0bd | sha256sum --check
           unzip -q maestro.zip -d "$HOME/maestro-cli"
           echo "$HOME/maestro-cli/maestro/bin" >> "$GITHUB_PATH"

@@ -4,17 +4,13 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { FontAwesome as Icon } from '@expo/vector-icons';
 
-type RootStackParamList = {
-  Introduction: undefined;
-  Listening: undefined;
-  // ... other screens
-};
+import { RootStackParamList } from '../types/navigation';
 
 type BottomBarNavigationProp = StackNavigationProp<RootStackParamList, 'Introduction'>;
 
 interface BottomBarProps {
   title: string;
-  target: string;
+  target: keyof RootStackParamList;
   showNext?: boolean;
   onPress?: () => void;
   disabled?: boolean;

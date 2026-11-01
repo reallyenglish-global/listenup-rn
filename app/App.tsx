@@ -1,22 +1,2 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import Introduction from '@/components/Introduction';
-import Listening from '@/components/Listening';
-import Test from '@/components/Test';
-
-const Stack = createStackNavigator();
-
-const App = () => {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Introduction" headerMode="none">
-        <Stack.Screen name="Introduction" component={Introduction} />
-        <Stack.Screen name="Listening" component={Listening} />
-        <Stack.Screen name="Test" component={Test} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-};
-
-export default App;
+// Keep the legacy /App entry on the same session-backed native navigator.
+export { default } from './(tabs)/index';
