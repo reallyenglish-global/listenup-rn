@@ -6,20 +6,24 @@ import Listening from '@/components/Listening';
 import Test from '@/components/Test';
 import TranscriptReview from '@/components/TranscriptReview';
 import { SessionProvider } from '@/hooks/useSession';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Stack = createStackNavigator();
 
 const App = () => {
   return (
     <SessionProvider>
-    <NavigationIndependentTree><NavigationContainer>
-      <Stack.Navigator initialRouteName="Introduction" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Introduction" component={Introduction} />
-        <Stack.Screen name="Listening" component={Listening} />
-        <Stack.Screen name="Test" component={Test} />
-        <Stack.Screen name="TranscriptReview" component={TranscriptReview} />
-      </Stack.Navigator>
-    </NavigationContainer></NavigationIndependentTree>
+      {/* Expo Router provides the inset context; consume each edge only here. */}
+      <SafeAreaView style={{ flex: 1 }} edges={['top', 'right', 'bottom', 'left']}>
+        <NavigationIndependentTree><NavigationContainer>
+          <Stack.Navigator initialRouteName="Introduction" screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="Introduction" component={Introduction} />
+            <Stack.Screen name="Listening" component={Listening} />
+            <Stack.Screen name="Test" component={Test} />
+            <Stack.Screen name="TranscriptReview" component={TranscriptReview} />
+          </Stack.Navigator>
+        </NavigationContainer></NavigationIndependentTree>
+      </SafeAreaView>
     </SessionProvider>
   );
 };

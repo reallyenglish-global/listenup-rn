@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { FontAwesome as Icon } from '@expo/vector-icons';
 import Speakers from './Speakers';
@@ -20,7 +20,7 @@ const Listening = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <ScrollView>
       <HeaderBar title={"Stage " + currentStage.number} />
 
@@ -61,7 +61,7 @@ const Listening = () => {
       </View>
       </ScrollView>
       <BottomBar title="Challenge" target="Test" />
-    </SafeAreaView>
+    </View>
   );
 };
 
