@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, Platform } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Slider from '@react-native-community/slider';
 import TrackPlayer, { State, Capability, AppKilledPlaybackBehavior, useProgress, usePlaybackState, useTrackPlayerEvents, Event } from 'react-native-track-player';
@@ -34,7 +34,13 @@ const useAudioPlayer = (audioUrl: number) => {
       await setup;
       if (!active) return;
       await TrackPlayer.reset();
-      await TrackPlayer.add({ url: Image.resolveAssetSource(audioUrl).uri, title: 'ListenUp', artist: 'ReallyEnglish' });
+      const source = Image.resolveAssetSource(audioUrl).uri;
+      // Metro release audio lives in res/raw. A bare resource name is not a
+      // filesystem path; ExoPlayer resolves this URI in the current package.
+      const url = Platform.OS === 'android' && /^[a-z0-9_]+$/.test(source)
+        ? `android.resource:///raw/${source}`
+        : source;
+      await TrackPlayer.add({ url, title: 'ListenUp', artist: 'ReallyEnglish' });
       await TrackPlayer.setRate(1);
       if (active) setIsReady(true);
     }).catch(() => { if (active) setError(true); });
