@@ -18,7 +18,7 @@ export class Challenge {
       correct: false,
       answer: '',
       correctAnswer: question.options[0],
-      options: question.options
+      options: [...question.options]
         .sort(() => Math.random() - 0.5)
         .map(option => option.split('|').sort(() => Math.random() - 0.5)[0])
     }));
@@ -28,7 +28,7 @@ export class Challenge {
   answer(id: number, answer: string): void {
     let question = this.questions[id];
     question.answer = answer;
-    question.correct = question.correctAnswer.indexOf(answer) > -1;
+    question.correct = question.correctAnswer.split('|').includes(answer);
   }
 
   passed(): boolean {

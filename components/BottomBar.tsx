@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import { FontAwesome as Icon } from '@expo/vector-icons';
 
 type RootStackParamList = {
   Introduction: undefined;
@@ -16,9 +16,11 @@ interface BottomBarProps {
   title: string;
   target: string;
   showNext?: boolean;
+  onPress?: () => void;
+  disabled?: boolean;
 }
 
-const BottomBar: React.FC<BottomBarProps> = ({ title, target, showNext=true }) => {
+const BottomBar: React.FC<BottomBarProps> = ({ title, target, showNext=true, onPress, disabled=false }) => {
   const navigation = useNavigation<BottomBarNavigationProp>();
 
   const handleClick = () => {
@@ -27,7 +29,7 @@ const BottomBar: React.FC<BottomBarProps> = ({ title, target, showNext=true }) =
 
   return (
     <View style={styles.bottomBar}>
-      <TouchableOpacity style={styles.startButton} onPress={handleClick}>
+      <TouchableOpacity style={styles.startButton} accessibilityRole="button" accessibilityLabel={title} disabled={disabled} onPress={onPress ?? handleClick}>
         <Text style={styles.startButtonText}>{ title }</Text>
         { showNext && (<Icon name="chevron-right" size={18} color="#fff" />)}
       </TouchableOpacity>

@@ -1,37 +1,48 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import Slider from '@react-native-community/slider';
-import { ListeningSession } from '../services/ListeningSession';
+import { useSession } from '../hooks/useSession';
+import { Alert } from 'react-native';
 import HeaderBar from './HeaderBar';
-import { AudioPlayer } from './AudioPlayer';
+import { AudioPlayer, useAudioPlayer } from './AudioPlayer';
 import BottomBar from './BottomBar';
 const TranscriptReview = ({ navigation, route }) => {
-  const stage = new ListeningSession().getCurrentStage();
+  const { session } = useSession();
+  const stage = session!.getCurrentStage();
+  const player = useAudioPlayer(stage.audioUrl);
+  const [saving, setSaving] = useState(false);
+  const finish = async () => {
+    if (saving) return;
+    setSaving(true);
+    try {
+      await session!.moveToNextStage();
+      navigation.reset({ index: 0, routes: [{ name: 'Introduction' }] });
+    } catch {
+      Alert.alert('Progress not saved', 'Please try Done again.');
+      setSaving(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
       <HeaderBar title={"Stage " + stage.number + ' - Transcript'} />
-      <View style={styles.container}>
-      { console.log('================', stage) }
+      <View>
         <AudioPlayer
-          audioUrl={stage.audioUrl}
-          containerStyle={styles.audioPlayerContainer}
-          sliderStyle={styles.audioPlayerSlider}
-          textStyle={styles.audioPlayerText}
+          player={player}
         />
       </View>
       <ScrollView style={styles.transcriptContainer}>
         <Text style={styles.transcriptText}>{stage.transcript}</Text>
       </ScrollView>
 
-      <BottomBar title="Done" target="Introduction" showNext={false}/>
+      <BottomBar title={saving ? "Saving…" : "Done"} target="Introduction" showNext={false} onPress={finish} disabled={saving}/>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    // Your container styles
+    flex: 1,
   },
   title: {
     // Title styles
@@ -54,7 +65,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     // respect line breaks in the transcript
     // repsect \r\n as well as \n
-    whiteSpace: 'pre-wrap',
+
   },
   doneButton: {
     backgroundColor: '#007bff',

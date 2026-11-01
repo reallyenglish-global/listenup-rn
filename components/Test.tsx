@@ -25,18 +25,14 @@ const Test = ({ navigation }) => {
   }, []);
 
   const handleOptionPress = async (option: string) => {
-    if (!challenge) return;
+    if (!challenge || notification) return;
 
     challenge.answer(currentQuestionIndex, option);
     if (currentQuestionIndex === questions.length - 1) {
       const passed = challenge.passed();
       if (passed) {
         showNotification(challenge.response(), 'success');
-        await session.moveToNextStage();
-        const newChallenge = new Challenge(stage);
-        setChallenge(newChallenge);
-        setQuestions(newChallenge.getQuestions());
-        setCurrentQuestionIndex(0);
+        // Keep the completed stage active until transcript review is done.
       } else {
         showNotification(challenge.response(), 'warning');
       }
@@ -57,7 +53,7 @@ const Test = ({ navigation }) => {
     if (notification.type === 'success') {
       navigation.navigate('TranscriptReview');
     } else if (notification.type === 'warning') {
-      navigation.navigate('Introduction');
+      navigation.reset({ index: 0, routes: [{ name: 'Introduction' }] });
     }
     setNotification(null);
   };

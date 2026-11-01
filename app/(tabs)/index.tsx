@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, NavigationIndependentTree } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Introduction from '@/components/Introduction';
 import Listening from '@/components/Listening';
@@ -12,14 +12,14 @@ const Stack = createStackNavigator();
 const App = () => {
   return (
     <SessionProvider>
-    <NavigationContainer independent={true}>
-      <Stack.Navigator initialRouteName="Introduction" headerMode="none">
+    <NavigationIndependentTree><NavigationContainer>
+      <Stack.Navigator initialRouteName="Introduction" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Introduction" component={Introduction} />
         <Stack.Screen name="Listening" component={Listening} />
         <Stack.Screen name="Test" component={Test} />
         <Stack.Screen name="TranscriptReview" component={TranscriptReview} />
       </Stack.Navigator>
-    </NavigationContainer>
+    </NavigationContainer></NavigationIndependentTree>
     </SessionProvider>
   );
 };

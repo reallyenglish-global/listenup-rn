@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, View, StyleSheet } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import { FontAwesome as Icon } from '@expo/vector-icons';
 
 interface PlayButtonProps {
   isPlaying: boolean;
@@ -18,7 +18,7 @@ const PlayButton: React.FC<PlayButtonProps> = ({
   style
 }) => {
   return (
-    <TouchableOpacity onPress={onPress} style={[styles.button, style]}>
+    <TouchableOpacity accessibilityRole="button" accessibilityLabel={isPlaying ? "Pause audio" : "Play audio"} onPress={onPress} style={[styles.button, style]}>
       <View style={[styles.iconContainer, { width: size, height: size }]}>
         <Icon
           name={isPlaying ? 'pause' : 'play'}

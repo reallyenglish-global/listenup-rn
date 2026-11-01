@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, useWindowDimensions } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import { FontAwesome as Icon } from '@expo/vector-icons';
 import Speakers from './Speakers';
 import FailedTimes from './FailedTimes';
 import { useSession } from '@/hooks/useSession';
@@ -21,7 +21,7 @@ const Introduction = ({ navigation }) => {
   const SPEAKER_IMAGE_HEIGHT = 150; // Adjust this value to match your speaker image height
 
   return (
-    <View style={[styles.container, { width, height }]}>
+    <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
           <View key={stage.number} style={styles.stage}>
             <HeaderBar title={"Stage " + stage.number} />
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   },
   contextContainer: {
     flex: 1,
-    justifyContent: 'top',
+    justifyContent: 'flex-start',
   },
   context: {
     padding: 10,
