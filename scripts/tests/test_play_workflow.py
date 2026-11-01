@@ -7,13 +7,15 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class PlayWorkflowTests(unittest.TestCase):
-    def test_main_manual_gate_and_no_automatic_release_trigger(self):
+    def test_production_manual_gate_and_no_automatic_release_trigger(self):
         workflow = (ROOT / '.github/workflows/google-play.yml').read_text()
         self.assertNotIn('  push:', workflow)
         self.assertNotIn('  pull_request:', workflow)
-        self.assertIn("if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'", workflow)
-        self.assertIn("if: github.ref == 'refs/heads/main' && needs.build.outputs.upload == 'true'", workflow)
+        self.assertIn("if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/production'", workflow)
+        self.assertIn("if: github.ref == 'refs/heads/production' && needs.build.outputs.upload == 'true'", workflow)
         self.assertNotIn('refs/heads/ci/', workflow)
+        self.assertNotIn('refs/heads/main', workflow)
+        self.assertIn('git merge-base --is-ancestor HEAD origin/production', workflow)
         self.assertIn('cancel-in-progress: false', workflow)
 
     def test_selected_destination_flows_to_upload_and_readback(self):
@@ -31,6 +33,7 @@ class PlayWorkflowTests(unittest.TestCase):
         caller = workflow.split('  signed-bundle:', 1)[1].split('  build-preview-apk:', 1)[0]
         self.assertIn('uses: ./.github/workflows/google-play.yml', caller)
         self.assertIn('upload: false', caller)
+        self.assertIn("github.ref == 'refs/heads/production'", caller)
 
 
 if __name__ == '__main__':

@@ -12,7 +12,7 @@ on:
         type: string
         required: false
       signed_bundle:
-        description: 'Also build a signed AAB (main only; never upload)'
+        description: 'Also build a signed AAB (production only; never upload)'
         type: boolean
         default: false
         required: false
@@ -22,7 +22,7 @@ permissions:
 
 jobs:
   signed-bundle:
-    if: github.event_name == 'workflow_dispatch' && inputs.signed_bundle
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/production' && inputs.signed_bundle
     uses: ./.github/workflows/google-play.yml
     with:
       version_code: ${{ inputs.version_code }}

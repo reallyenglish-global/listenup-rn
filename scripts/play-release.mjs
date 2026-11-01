@@ -2,8 +2,8 @@ import { appendFileSync, readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
 export function releaseMetadata(env, config) {
-  if (env.GITHUB_EVENT_NAME !== 'workflow_dispatch' || env.GITHUB_REF !== 'refs/heads/main') {
-    throw new Error('Signed Play builds and uploads require manual dispatch on main');
+  if (env.GITHUB_EVENT_NAME !== 'workflow_dispatch' || env.GITHUB_REF !== 'refs/heads/production') {
+    throw new Error('Signed Play builds and uploads require manual dispatch on production');
   }
   const version = config.expo.version;
   if (!/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(version)) throw new Error('Set an X.Y.Z app.json version first');
