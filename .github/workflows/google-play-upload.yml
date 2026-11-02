@@ -1,0 +1,195 @@
+name: Request Play upload approval (retained AAB)
+
+# Only the explicit protected production workflow can request an internal draft.
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: 'Successful production Google Play signed release run ID'
+        type: string
+        required: true
+      source_artifact_id:
+        description: 'Exact unexpired signed AAB artifact ID from that run'
+        type: string
+        required: true
+      expected_aab_sha256:
+        description: 'Expected AAB SHA256, 64 lowercase hex characters'
+        type: string
+        required: true
+      expected_version_code:
+        description: 'Version code embedded in the retained AAB; cannot be changed here'
+        type: string
+        required: true
+      expected_upload_key_sha256:
+        description: 'Play Console upload certificate SHA256 (lowercase hex, no colons)'
+        type: string
+        required: true
+      console_max_version_code:
+        description: 'Human-confirmed maximum used code across all tracks/drafts; 0 only if none'
+        type: string
+        required: true
+      request_internal_draft:
+        description: 'Request human approval to upload this exact AAB as internal/draft (no rollout)'
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: listenup-google-play
+  cancel-in-progress: false
+
+env:
+  SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+  SOURCE_ARTIFACT_ID: ${{ inputs.source_artifact_id }}
+  EXPECTED_AAB_SHA256: ${{ inputs.expected_aab_sha256 }}
+  EXPECTED_VERSION_CODE: ${{ inputs.expected_version_code }}
+  EXPECTED_UPLOAD_KEY_SHA256: ${{ inputs.expected_upload_key_sha256 }}
+  CONSOLE_MAX_VERSION_CODE: ${{ inputs.console_max_version_code }}
+  REQUEST_INTERNAL_DRAFT: ${{ inputs.request_internal_draft }}
+
+jobs:
+  prepare:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/production'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      artifact: ${{ steps.verify.outputs.artifact }}
+      receipt_sha256: ${{ steps.verify.outputs.receipt_sha256 }}
+      aab_sha256: ${{ steps.verify.outputs.aab_sha256 }}
+      version: ${{ steps.verify.outputs.version }}
+      version_code: ${{ steps.verify.outputs.version_code }}
+      source_sha: ${{ steps.verify.outputs.source_sha }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Verify source run, artifact identity and production ancestry
+        id: source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/play-upload-request.py source
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          artifact-ids: ${{ steps.source.outputs.artifact_id }}
+          run-id: ${{ steps.source.outputs.source_run_id }}
+          github-token: ${{ github.token }}
+          path: play-artifact
+          merge-multiple: true
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Fetch checksum-pinned bundle inspector
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --max-time 120 \
+            https://github.com/google/bundletool/releases/download/1.18.3/bundletool-all-1.18.3.jar \
+            --output "$RUNNER_TEMP/bundletool.jar"
+          printf '%s  %s\n' a099cfa1543f55593bc2ed16a70a7c67fe54b1747bb7301f37fdfd6d91028e29 "$RUNNER_TEMP/bundletool.jar" | sha256sum --check
+      - name: Inspect exact signed bundle and prepare approval receipt
+        id: verify
+        run: python3 scripts/play-upload-request.py prepare --bundletool "$RUNNER_TEMP/bundletool.jar"
+      - name: Retain exact verified bundle and approval receipt without publishing
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: ${{ steps.verify.outputs.artifact }}
+          path: play-artifact/
+          if-no-files-found: error
+          retention-days: 7
+
+  upload:
+    needs: prepare
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/production'
+    name: Approve internal draft version ${{ needs.prepare.outputs.version_code }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    # Existing required human reviewer and production-only policy remain in force.
+    environment:
+      name: google-play
+      url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - name: Require independently enabled publisher readiness
+        env:
+          PLAY_UPLOAD_ENABLED: ${{ vars.PLAY_UPLOAD_ENABLED }}
+        run: |
+          if [ "$PLAY_UPLOAD_ENABLED" != true ]; then
+            printf 'PLAY_UPLOAD_ENABLED remains disabled. No Play write performed.\n' >&2
+            exit 1
+          fi
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2; current request run only
+        with:
+          name: ${{ needs.prepare.outputs.artifact }}
+          path: play-artifact
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Fetch checksum-pinned bundle inspector
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --max-time 120 \
+            https://github.com/google/bundletool/releases/download/1.18.3/bundletool-all-1.18.3.jar \
+            --output "$RUNNER_TEMP/bundletool.jar"
+          printf '%s  %s\n' a099cfa1543f55593bc2ed16a70a7c67fe54b1747bb7301f37fdfd6d91028e29 "$RUNNER_TEMP/bundletool.jar" | sha256sum --check
+      - name: Reverify exact request, receipt, embedded version and certificate after human approval
+        env:
+          PLAY_UPLOAD_ENABLED: ${{ vars.PLAY_UPLOAD_ENABLED }}
+          EXPECTED_RECEIPT_SHA256: ${{ needs.prepare.outputs.receipt_sha256 }}
+        run: python3 scripts/play-upload-request.py approved --bundletool "$RUNNER_TEMP/bundletool.jar"
+      - name: Check publisher credential exists without exposing it
+        env:
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [ -z "$PLAY_SERVICE_ACCOUNT_JSON" ]; then
+            printf 'Missing google-play secret PLAY_SERVICE_ACCOUNT_JSON\n' >&2
+            exit 1
+          fi
+      - name: Open an owned edit only if the internal track is empty
+        id: edit
+        env:
+          PLAY_UPLOAD_ENABLED: ${{ vars.PLAY_UPLOAD_ENABLED }}
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        run: python3 scripts/play-empty-internal-edit.py create
+      - name: Recheck exact bytes immediately before publishing
+        env:
+          EXPECTED_AAB_SHA256: ${{ needs.prepare.outputs.aab_sha256 }}
+          EXPECTED_RECEIPT_SHA256: ${{ needs.prepare.outputs.receipt_sha256 }}
+        run: |
+          set -euo pipefail
+          [[ "$EXPECTED_AAB_SHA256" =~ ^[0-9a-f]{64}$ ]]
+          [[ "$EXPECTED_RECEIPT_SHA256" =~ ^[0-9a-f]{64}$ ]]
+          printf '%s  play-artifact/listenup.aab\n%s  play-artifact/approval-receipt.json\n' \
+            "$EXPECTED_AAB_SHA256" "$EXPECTED_RECEIPT_SHA256" | sha256sum --check
+      - name: Upload only the approved internal draft into the checked edit
+        id: publish
+        uses: r0adkll/upload-google-play@e738b9dd8f2476ea806d921b64aacd24f34515a5 # v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.reallyenglish.listenup
+          releaseFiles: play-artifact/listenup.aab
+          track: internal
+          status: draft
+          changesNotSentForReview: true
+          existingEditId: ${{ steps.edit.outputs.edit_id }}
+          releaseName: ListenUp ${{ needs.prepare.outputs.version }} (${{ needs.prepare.outputs.version_code }})
+      - name: Read back exact internal draft and AAB checksum
+        env:
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          PLAY_VERSION_CODE: ${{ needs.prepare.outputs.version_code }}
+          PLAY_AAB_SHA256: ${{ needs.prepare.outputs.aab_sha256 }}
+          PLAY_TRACK: internal
+          PLAY_STATUS: draft
+        run: python3 scripts/verify-play-upload.py
+      - name: Clean up only this request's uncommitted edit on publisher failure
+        if: always() && steps.edit.outputs.edit_id != '' && steps.publish.outcome != 'success'
+        env:
+          PLAY_UPLOAD_ENABLED: ${{ vars.PLAY_UPLOAD_ENABLED }}
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          OWNED_PLAY_EDIT_ID: ${{ steps.edit.outputs.edit_id }}
+        run: python3 scripts/play-empty-internal-edit.py cleanup

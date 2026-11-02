@@ -2,6 +2,10 @@
 
 Repository: `reallyenglish-global/listenup-rn`. Android package: `com.reallyenglish.listenup`.
 
+For a separately approved **upload-only internal draft** using an already-built
+signed AAB, see [retained AAB approval procedure](google-play-upload-approval.md).
+It does not rebuild, enable publishing or bypass the protected human approval.
+
 ## Safety and prerequisites
 
 The signed workflow runs **only by manual dispatch on `production`**. Pushes, tags and PRs do not build/sign/upload releases. Both jobs check the production ref, and the metadata policy independently rejects other refs/events. Application/preview CI still runs on PRs so workflow changes can be checked before merge. Merging does **not** authorize or trigger a Play upload.
@@ -52,7 +56,7 @@ Open **Actions → Google Play signed release → Run workflow**, selecting **pr
 
 ### Build-only inspection / first manual upload prerequisites
 
-Leave `upload=false`. Download the signed non-debug **AAB**, `SHA256SUMS` and `release.json` from the run artifact (14-day retention). Check package/version/target/certificate/hash. A raw-run-number artifact is build-only evidence, not permission or proof of version-code eligibility for a first manual upload; rebuild with a Console-checked code before a separately authorized upload. Track/status inputs do not publish anything when upload is false.
+Leave `upload=false`. Download the signed non-debug **AAB**, `SHA256SUMS` and `release.json` from the run artifact (14-day retention). Check package/version/target/certificate/hash. A raw-run-number artifact is build-only evidence, not permission or proof of version-code eligibility for a first manual upload. Reuse it only after confirming its embedded code is unused and above every Console code; otherwise build a new AAB with a checked code. Track/status inputs do not publish anything when upload is false.
 
 The **Android APK** workflow also supports dispatch on production with `signed_bundle=true` and optional `version_code`; its reusable call is build-only (`upload=false`) and defaults to internal/draft metadata. An omitted code uses that caller workflow's raw run number. Preview APK builds do not need a version code. Non-production signed calls are skipped and cannot access signing secrets.
 

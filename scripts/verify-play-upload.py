@@ -46,19 +46,9 @@ def check_bundle(bundles, code, sha256):
         raise ValueError('Play bundle checksum does not match the exact built artifact')
 
 
-def main():
-    code = os.environ['PLAY_VERSION_CODE']
-    sha256 = os.environ['PLAY_AAB_SHA256']
-    if not re.fullmatch(r'[0-9a-f]{64}', sha256):
-        raise ValueError('Invalid expected bundle SHA256')
-    if not re.fullmatch(r'[1-9][0-9]*', code):
-        raise ValueError('Invalid versionCode')
-    track = os.environ['PLAY_TRACK']
-    status = os.environ['PLAY_STATUS']
-    if track not in ('internal', 'production') or status not in ('draft', 'completed'):
-        raise ValueError('Invalid expected Play destination or status')
-    account = json.loads(os.environ['PLAY_SERVICE_ACCOUNT_JSON'])
-    if account.get('type') != 'service_account':
+def publisher_access_token(account):
+    """Authenticate only inside an approved publisher job; never log key/token material."""
+    if not isinstance(account, dict) or account.get('type') != 'service_account':
         raise ValueError('Expected service-account JSON')
     def encode(obj):
         return base64.urlsafe_b64encode(json.dumps(obj, separators=(',', ':')).encode()).rstrip(b'=')
@@ -73,7 +63,21 @@ def main():
         if signed.returncode:
             raise RuntimeError('Could not sign Play verification assertion')
     assertion = (unsigned + b'.' + base64.urlsafe_b64encode(signed.stdout).rstrip(b'=')).decode()
-    token = json_request(TOKEN_URL, 'POST', {'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer', 'assertion': assertion}, form=True)['access_token']
+    return json_request(TOKEN_URL, 'POST', {'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer', 'assertion': assertion}, form=True)['access_token']
+
+
+def main():
+    code = os.environ['PLAY_VERSION_CODE']
+    sha256 = os.environ['PLAY_AAB_SHA256']
+    if not re.fullmatch(r'[0-9a-f]{64}', sha256):
+        raise ValueError('Invalid expected bundle SHA256')
+    if not re.fullmatch(r'[1-9][0-9]*', code):
+        raise ValueError('Invalid versionCode')
+    track = os.environ['PLAY_TRACK']
+    status = os.environ['PLAY_STATUS']
+    if track not in ('internal', 'production') or status not in ('draft', 'completed'):
+        raise ValueError('Invalid expected Play destination or status')
+    token = publisher_access_token(json.loads(os.environ['PLAY_SERVICE_ACCOUNT_JSON']))
     edit = json_request(BASE, 'POST', {}, token)['id']
     if not re.fullmatch(r'[A-Za-z0-9_-]+', edit):
         raise RuntimeError('Unexpected Play edit ID')
