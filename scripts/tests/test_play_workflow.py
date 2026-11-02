@@ -18,6 +18,16 @@ class PlayWorkflowTests(unittest.TestCase):
         self.assertIn('git merge-base --is-ancestor HEAD origin/production', workflow)
         self.assertIn('cancel-in-progress: false', workflow)
 
+    def test_version_code_can_be_omitted_for_raw_run_number_builds_only(self):
+        workflow = (ROOT / '.github/workflows/google-play.yml').read_text()
+        fields = workflow.split('      version_code:\n')[1:]
+        self.assertEqual(len(fields), 2, 'dispatch and reusable input declarations')
+        for field in fields:
+            declaration = field.split('      upload:', 1)[0]
+            self.assertIn('required: false', declaration)
+            self.assertIn('run number', declaration)
+        self.assertIn('PLAY_VERSION_CODE: ${{ inputs.version_code }}', workflow)
+
     def test_selected_destination_flows_to_upload_and_readback(self):
         workflow = (ROOT / '.github/workflows/google-play.yml').read_text()
         for field in ('track', 'status'):

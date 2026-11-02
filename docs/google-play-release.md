@@ -26,7 +26,11 @@ Never print values. Signing material is decoded into runner temp with mode 0600 
 
 Set environment variable `PLAY_UPLOAD_ENABLED` to exactly `true` only after first-upload/bootstrap, signing, API permissions and target API setup are complete. Requested uploads fail while unset; build-only is still available. This change does not enable the variable or grant permissions.
 
-Every dispatch requires an explicit `version_code`: an unused positive decimal integer at most 2,100,000,000, **greater than every code previously uploaded across all Play tracks and drafts**. Inspect Play Console before selecting it. The helper validates syntax, not global availability; workflow counters cannot safely allocate codes. The former tag variable `PLAY_VERSION_CODE` and release tags are no longer used to trigger releases.
+Every **upload** dispatch requires an explicit `version_code`: an unused positive decimal integer at most 2,100,000,000, **greater than every code previously uploaded across all Play tracks and drafts**. Inspect Play Console before selecting it; the helper validates syntax, not global availability.
+
+For **build-only** dispatches (`upload=false`), omit `version_code` to use the **raw GitHub Actions run number**, with no offset and no run-attempt component. This is the caller workflow's run number for a reusable call. Reruns keep the same code, and workflow counters can reset. Such artifacts are inspection-only: the raw counter can be below previously uploaded codes and must not be uploaded without a separately confirmed acceptable code and authorization. An explicit code still overrides the build-only default; uploads never fall back to a run counter. The former tag variable `PLAY_VERSION_CODE` and release tags are no longer used to trigger releases.
+
+The requested Android display version is exactly `2026.1`. The release policy accepts `X.Y` or `X.Y.Z` strings and preserves them without normalization; display version and integer versionCode are independent.
 
 ## Branch setup and promotion
 
@@ -40,17 +44,17 @@ Promote later application changes through review before dispatching on `producti
 
 Open **Actions → Google Play signed release → Run workflow**, selecting **production**:
 
-- `version_code`: the checked unused Android versionCode.
+- `version_code`: omit for a build-only raw run-number code; required and Console-checked for any upload.
 - `upload`: defaults to `false` (build-only).
 - `track`: `internal` for testing (default), or `production` for public release.
 - `status`: `draft` (default, save for review), or `completed` (submit full rollout).
 - `confirm_release`: defaults to `false`; must be explicitly `true` for an uploaded `completed` release on either track.
 
-### Build-only / first manual upload
+### Build-only inspection / first manual upload prerequisites
 
-Leave `upload=false`. Download the signed non-debug **AAB**, `SHA256SUMS` and `release.json` from the run artifact (14-day retention). Check package/version/target/certificate/hash before a first manual upload. Track/status inputs do not publish anything when upload is false.
+Leave `upload=false`. Download the signed non-debug **AAB**, `SHA256SUMS` and `release.json` from the run artifact (14-day retention). Check package/version/target/certificate/hash. A raw-run-number artifact is build-only evidence, not permission or proof of version-code eligibility for a first manual upload; rebuild with a Console-checked code before a separately authorized upload. Track/status inputs do not publish anything when upload is false.
 
-The **Android APK** workflow also supports dispatch on production with `signed_bundle=true` and `version_code`; its reusable call is build-only (`upload=false`) and defaults to internal/draft metadata. Preview APK builds do not need a version code. Non-production signed calls are skipped and cannot access signing secrets.
+The **Android APK** workflow also supports dispatch on production with `signed_bundle=true` and optional `version_code`; its reusable call is build-only (`upload=false`) and defaults to internal/draft metadata. An omitted code uses that caller workflow's raw run number. Preview APK builds do not need a version code. Non-production signed calls are skipped and cannot access signing secrets.
 
 ### Internal testing
 

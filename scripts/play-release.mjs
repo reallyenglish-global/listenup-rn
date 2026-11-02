@@ -6,7 +6,7 @@ export function releaseMetadata(env, config) {
     throw new Error('Signed Play builds and uploads require manual dispatch on production');
   }
   const version = config.expo.version;
-  if (!/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(version)) throw new Error('Set an X.Y.Z app.json version first');
+  if (typeof version !== 'string' || !/^(0|[1-9]\d*)\.(0|[1-9]\d*)(\.(0|[1-9]\d*))?$/.test(version)) throw new Error('Set an X.Y or X.Y.Z app.json version first');
   if (config.expo.android?.package !== 'com.reallyenglish.listenup') throw new Error('Unexpected Android package');
   const requested = env.PLAY_UPLOAD_REQUESTED === 'true';
   const track = env.PLAY_TRACK || 'internal';
@@ -16,9 +16,11 @@ export function releaseMetadata(env, config) {
   if (requested && status === 'completed' && env.PLAY_CONFIRM_RELEASE !== 'true') {
     throw new Error('Publishing to testers or production requires confirm_release=true');
   }
-  // Workflow-local run counters reset; select an unused code after checking Play Console.
-  const value = env.PLAY_VERSION_CODE;
-  if (!/^[1-9]\d*$/.test(value ?? '') || !Number.isSafeInteger(Number(value))) throw new Error('Invalid version code (set explicit version_code input)');
+  // Build-only artifacts may use the raw workflow counter. Never assume that counter
+  // is unused/monotonic across Play tracks, workflow replacements or reruns: uploads
+  // still require an explicit code checked against Play Console.
+  const value = env.PLAY_VERSION_CODE || (requested ? undefined : env.GITHUB_RUN_NUMBER);
+  if (!/^[1-9]\d*$/.test(value ?? '') || !Number.isSafeInteger(Number(value))) throw new Error('Invalid version code (upload requires explicit version_code; build-only requires it or GITHUB_RUN_NUMBER)');
   const code = Number(value);
   if (code > 2100000000) throw new Error('Version code exceeds Play limit');
   if (requested && env.PLAY_UPLOAD_ENABLED !== 'true') throw new Error('Enable PLAY_UPLOAD_ENABLED only after first-upload/API/SDK setup; manual build-only remains available');

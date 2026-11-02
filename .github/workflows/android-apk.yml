@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       version_code:
-        description: 'Required for signed_bundle: unused Android versionCode checked against Play Console'
+        description: 'Optional for signed_bundle: omit to use this workflow run number (build-only)'
         type: string
         required: false
       signed_bundle:

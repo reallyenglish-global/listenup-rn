@@ -4,9 +4,9 @@ on:
   workflow_call:
     inputs:
       version_code:
-        description: 'Unused Android versionCode selected after checking Play Console'
+        description: 'Optional for build-only: defaults to raw GitHub run number; uploads require a Console-checked unused code'
         type: string
-        required: true
+        required: false
       upload:
         type: boolean
         default: false
@@ -14,9 +14,9 @@ on:
   workflow_dispatch:
     inputs:
       version_code:
-        description: 'Unused Android versionCode, greater than every code uploaded to Play'
+        description: 'Optional for build-only: defaults to raw GitHub run number; uploads require a Console-checked unused code'
         type: string
-        required: true
+        required: false
       upload:
         description: 'Upload to Play (first upload must be manual in Play Console)'
         type: boolean

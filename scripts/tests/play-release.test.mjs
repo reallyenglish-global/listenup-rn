@@ -51,21 +51,41 @@ test('reject mismatched and injected tags, arbitrary refs and PR events', () => 
   }
   assert.throws(() => releaseMetadata({ ...env, GITHUB_EVENT_NAME: 'workflow_dispatch', GITHUB_REF: 'refs/heads/feature' }, config));
 });
+test('keeps the approved year.release display version exactly 2026.1', () => {
+  const calendarVersion = { expo: { ...config.expo, version: '2026.1' } };
+  assert.equal(releaseMetadata(env, calendarVersion).version, '2026.1');
+  assert.equal(require('../../app.json').expo.version, '2026.1');
+});
 test('reject wrong package and invalid app versions', () => {
   assert.throws(() => releaseMetadata(env, { expo: { ...config.expo, android: { package: 'another.app' } } }));
-  for (const version of ['01.0.0', '1.0', '1.0.0-rc.1']) assert.throws(() => releaseMetadata(env, { expo: { ...config.expo, version } }));
+  for (const version of ['01.0.0', '1', '2026.01', '1.0.0-rc.1', 2026.1]) assert.throws(() => releaseMetadata(env, { expo: { ...config.expo, version } }));
 });
 test('an explicit code survives workflow numbering resets and reruns', () => {
   const explicit = { ...env, PLAY_VERSION_CODE: '1001002' };
   assert.equal(releaseMetadata(explicit, config).versionCode, 1001002);
   assert.equal(releaseMetadata({ ...explicit, GITHUB_RUN_NUMBER: '1', GITHUB_RUN_ATTEMPT: '2' }, config).versionCode, 1001002);
 });
-test('explicit version codes are required and bounded, without run-counter dependencies', () => {
-  assert.equal(releaseMetadata({ ...env, PLAY_VERSION_CODE: '2100000000', GITHUB_RUN_NUMBER: undefined, GITHUB_RUN_ATTEMPT: undefined }, config).versionCode, 2100000000);
-  for (const value of [undefined, '', '0', '-1', '3.5', '1e3', '010', ' 1001001 ', '2100000001', '9007199254740993']) {
-    assert.throws(() => releaseMetadata({ ...env, PLAY_VERSION_CODE: value }, config), /version code/i);
+test('build-only defaults to the raw GitHub run number, with no offset or retry component', () => {
+  const build = { ...env, PLAY_VERSION_CODE: '', GITHUB_RUN_NUMBER: '3' };
+  assert.equal(releaseMetadata(build, config).versionCode, 3);
+  assert.equal(releaseMetadata({ ...build, PLAY_VERSION_CODE: undefined, GITHUB_RUN_ATTEMPT: '9' }, config).versionCode, 3);
+});
+test('uploads never fall back to the GitHub run number', () => {
+  for (const value of ['', undefined]) {
+    assert.throws(() => releaseMetadata({ ...env, PLAY_VERSION_CODE: value, PLAY_UPLOAD_REQUESTED: 'true' }, config), /version code/i);
   }
 });
+test('explicit upload version codes are required and bounded, without run-counter dependencies', () => {
+  assert.equal(releaseMetadata({ ...env, PLAY_VERSION_CODE: '2100000000', GITHUB_RUN_NUMBER: undefined, GITHUB_RUN_ATTEMPT: undefined }, config).versionCode, 2100000000);
+  for (const value of [undefined, '', '0', '-1', '3.5', '1e3', '010', ' 1001001 ', '2100000001', '9007199254740993']) {
+    assert.throws(() => releaseMetadata({ ...env, PLAY_VERSION_CODE: value, PLAY_UPLOAD_REQUESTED: 'true' }, config), /version code/i);
+  }
+});
+for (const value of [undefined, '', '0', '-1', '3.5', '1e3', '010', ' 3 ', '2100000001', '9007199254740993']) {
+  test(`invalid build-only run number ${JSON.stringify(value)} fails closed`, () => {
+    assert.throws(() => releaseMetadata({ ...env, PLAY_VERSION_CODE: '', GITHUB_RUN_NUMBER: value }, config), /version code/i);
+  });
+}
 test('dynamic config preserves preview fields and rejects unsafe version codes', () => {
   const old = process.env.PLAY_VERSION_CODE;
   try {
