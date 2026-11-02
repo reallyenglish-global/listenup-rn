@@ -45,6 +45,10 @@ class BundlePolicyTests(unittest.TestCase):
 
 
 class PlayReadbackTests(unittest.TestCase):
+    def test_publisher_auth_rejects_non_service_account_payloads(self):
+        for account in [None, [], {}, {'type': 'authorized_user'}]:
+            with self.subTest(account=account), self.assertRaises(ValueError):
+                upload.publisher_access_token(account)
     def test_exact_bundle_hash_required(self):
         sha = 'a' * 64
         upload.check_bundle({'bundles': [{'versionCode': 1001001, 'sha256': sha}]}, '1001001', sha)
