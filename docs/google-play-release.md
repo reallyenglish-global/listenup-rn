@@ -1,17 +1,17 @@
-# ListenUp: main-only signed Google Play releases
+# ListenUp: production-branch-only signed Google Play releases
 
 Repository: `reallyenglish-global/listenup-rn`. Android package: `com.reallyenglish.listenup`.
 
 ## Safety and prerequisites
 
-The signed workflow runs **only by manual dispatch on `main`**. Pushes, tags and PRs do not build/sign/upload releases. Both jobs check the main ref, and the metadata policy independently rejects other refs/events. Application/preview CI still runs on PRs so workflow changes can be checked before merge. Merging does **not** authorize or trigger a Play upload.
+The signed workflow runs **only by manual dispatch on `production`**. Pushes, tags and PRs do not build/sign/upload releases. Both jobs check the production ref, and the metadata policy independently rejects other refs/events. Application/preview CI still runs on PRs so workflow changes can be checked before merge. Merging does **not** authorize or trigger a Play upload.
 
 Before uploading:
 
 1. Check the intended Play Console app, first manual AAB upload, listings, declarations, Play App Signing enrolment, and package identity. Numeric Console IDs are not Publisher API track names.
 2. Verify that the dedicated upload key certificate matches Play Console and has a secure recoverable backup. Never rotate another app's key or expose private keys/passwords in Git, chat or artifacts.
 3. Confirm app-specific release permissions for the service account; production release permission is needed only for an explicitly authorized production run. Prior read-only API access does not prove upload/write authority. Do not grant billing/admin or unrelated Cloud IAM roles.
-4. Restrict the `google-play` environment to exact branch `main`, remove any legacy signing-validation exception, and consider required reviewers before secrets become available. This code change does not modify environment settings or permissions.
+4. Restrict the `google-play` environment to exact branch `production`, remove any legacy signing-validation exception, and consider required reviewers before secrets become available. This code change does not modify environment settings or permissions.
 5. Verify Actions capacity and a fresh signed native candidate, including physical-device/audio testing. CI policy tests alone do not prove Play acceptance.
 
 ## Configuration
@@ -28,9 +28,17 @@ Set environment variable `PLAY_UPLOAD_ENABLED` to exactly `true` only after firs
 
 Every dispatch requires an explicit `version_code`: an unused positive decimal integer at most 2,100,000,000, **greater than every code previously uploaded across all Play tracks and drafts**. Inspect Play Console before selecting it. The helper validates syntax, not global availability; workflow counters cannot safely allocate codes. The former tag variable `PLAY_VERSION_CODE` and release tags are no longer used to trigger releases.
 
+## Branch setup and promotion
+
+`main` remains the development/default branch; preview push/PR CI remains unchanged. The source branch `production` is independent of the selected Google Play track: production-branch builds can still upload to internal testing.
+
+Before the first dispatch, merge this workflow change through review, then explicitly create/promote `production` from the approved tested commit containing it. Restrict the `google-play` environment to exactly `production`, removing the old `main` and `ci/google-play-internal-drafts` allowances. Preserve existing reviewers and secrets. These remote branch and environment changes require owner approval and are not performed by this workflow.
+
+Promote later application changes through review before dispatching on `production`; never bypass the branch restriction with an arbitrary checkout ref. Branch creation/promotion does not automatically build or upload anything. Keep release-policy CI on `main` so proposed workflow changes are tested before promotion.
+
 ## Run the workflow
 
-Open **Actions → Google Play signed release → Run workflow**, selecting **main**:
+Open **Actions → Google Play signed release → Run workflow**, selecting **production**:
 
 - `version_code`: the checked unused Android versionCode.
 - `upload`: defaults to `false` (build-only).
@@ -42,7 +50,7 @@ Open **Actions → Google Play signed release → Run workflow**, selecting **ma
 
 Leave `upload=false`. Download the signed non-debug **AAB**, `SHA256SUMS` and `release.json` from the run artifact (14-day retention). Check package/version/target/certificate/hash before a first manual upload. Track/status inputs do not publish anything when upload is false.
 
-The **Android APK** workflow also supports dispatch on main with `signed_bundle=true` and `version_code`; its reusable call is build-only (`upload=false`) and defaults to internal/draft metadata. Preview APK builds do not need a version code. Non-main signed calls are skipped and cannot access signing secrets.
+The **Android APK** workflow also supports dispatch on production with `signed_bundle=true` and `version_code`; its reusable call is build-only (`upload=false`) and defaults to internal/draft metadata. Preview APK builds do not need a version code. Non-production signed calls are skipped and cannot access signing secrets.
 
 ### Internal testing
 
@@ -77,4 +85,4 @@ actionlint .github/workflows/google-play.yml .github/workflows/android-apk.yml
 pnpm exec jest --ci --runInBand
 ```
 
-Policy/readback fixtures are synthetic tests, not evidence of a real Play upload. A separately authorized main dispatch is needed to verify the full signed-build/upload path.
+Policy/readback fixtures are synthetic tests, not evidence of a real Play upload. A separately authorized production dispatch is needed to verify the full signed-build/upload path.
